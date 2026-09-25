@@ -1,0 +1,2359 @@
+@using System.Linq
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - BeautyCenter BD</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+
+<style>
+     
+     /* =========================================================
+    BEAUTYCENTER BD — PROFESSIONAL GLOBAL THEME
+    Navy + Royal Blue + Cyan
+    ========================================================= */
+     :root {
+         /* ---------- BRAND ---------- */
+         --bc-primary: #123C73;
+         --bc-primary-dark: #0B2850;
+         --bc-primary-light: #1D5DB5;
+         --bc-blue: #2563EB;
+         --bc-blue-dark: #1D4ED8;
+         --bc-blue-soft: #EFF6FF;
+         --bc-cyan: #0891B2;
+         --bc-cyan-light: #22D3EE;
+         --bc-cyan-soft: #ECFEFF;
+         /* ---------- TEXT ---------- */
+         --bc-text: #1E293B;
+         --bc-text-dark: #0F172A;
+         --bc-text-soft: #64748B;
+         --bc-text-light: #94A3B8;
+         /* ---------- BACKGROUND ---------- */
+         --bc-bg: #F8FAFC;
+         --bc-bg-soft: #F1F5F9;
+         --bc-white: #FFFFFF;
+         /* ---------- GLASS ---------- */
+         --glass-bg: rgba(255, 255, 255, 0.88);
+         --glass-bg-strong: rgba(255, 255, 255, 0.96);
+         --glass-border: rgba(148, 163, 184, 0.20);
+         /* ---------- SHADOW ---------- */
+         --shadow-sm: 0 4px 14px rgba(15, 23, 42, 0.06);
+         --shadow-md: 0 8px 25px rgba(15, 23, 42, 0.08);
+         --shadow-lg: 0 15px 40px rgba(15, 23, 42, 0.12);
+         --shadow-blue: 0 8px 24px rgba(37, 99, 235, 0.16);
+         /* ---------- SIDEBAR ---------- */
+         --sidebar-w: 64px;
+         --sidebar-w-open: 250px;
+         /* ---------- RADIUS ---------- */
+         --radius-sm: 8px;
+         --radius-md: 12px;
+         --radius-lg: 16px;
+         --radius-xl: 20px;
+     }
+
+
+     /* =========================================================
+    GLOBAL
+    ========================================================= */
+
+     * {
+         box-sizing: border-box;
+     }
+
+     html {
+         scroll-behavior: smooth;
+     }
+
+    body {
+        padding-top: 66px;
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+        color: var(--bc-text);
+        background: radial-gradient(circle at 10% 10%, rgba(16, 185, 129, 0.08), transparent 32%), radial-gradient(circle at 90% 90%, rgba(99, 102, 241, 0.07), transparent 35%), linear-gradient(135deg, #F0FDF4 0%, #FFFFFF 48%, #F1F5F9 100%);
+        min-height: 100vh;
+    }
+
+     a {
+         transition: all .25s ease;
+     }
+
+     button,
+     .btn {
+         font-family: 'Poppins', sans-serif;
+     }
+
+
+     /* =========================================================
+    MAIN NAVBAR
+    ========================================================= */
+
+    #mainNavbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1040;
+        min-height: 66px;
+        padding: 8px 18px;
+        background: radial-gradient(circle at 15% 20%, rgba(79, 70, 229, 0.08), transparent 30%), radial-gradient(circle at 88% 80%, rgba(244, 63, 94, 0.05), transparent 32%), linear-gradient(135deg, #FAF5FF 0%, #FFFFFF 50%, #F3F4F6 100%);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+        box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.04);
+        transition: background .3s ease, box-shadow .3s ease, border-color .3s ease;
+    }
+
+         #mainNavbar:hover {
+             background: rgba(255, 255, 255, 0.95);
+             box-shadow: 0 8px 28px rgba(15, 23, 42, 0.09);
+         }
+
+
+         /* =========================================================
+    BRAND
+    ========================================================= */
+
+         #mainNavbar .navbar-brand {
+             display: inline-flex;
+             align-items: center;
+             font-size: 1.3rem;
+             font-weight: 800;
+             letter-spacing: -.4px;
+             white-space: nowrap;
+             background: linear-gradient( 90deg, var(--bc-primary-dark), var(--bc-primary), var(--bc-blue) );
+             -webkit-background-clip: text;
+             -webkit-text-fill-color: transparent;
+             background-clip: text;
+             transition: transform .25s ease;
+         }
+
+             #mainNavbar .navbar-brand:hover {
+                 transform: translateY(-1px);
+             }
+
+             #mainNavbar .navbar-brand i {
+                 margin-right: 6px;
+                 color: var(--bc-blue);
+                 -webkit-text-fill-color: var(--bc-blue);
+             }
+
+
+         /* =========================================================
+    NAVIGATION LINKS
+    ========================================================= */
+
+         #mainNavbar .nav-link {
+             position: relative;
+             display: flex;
+             align-items: center;
+             color: #334155 !important;
+             font-size: .90rem;
+             font-weight: 500;
+             padding: 8px 13px;
+             margin: 0 3px;
+             border-radius: 10px;
+             white-space: nowrap;
+             transition: color .25s ease, background .25s ease, box-shadow .25s ease, transform .25s ease;
+         }
+
+             #mainNavbar .nav-link i {
+                 margin-right: 5px;
+                 color: #64748B;
+                 transition: color .25s ease, transform .25s ease;
+             }
+
+
+             /* Hover */
+
+             #mainNavbar .nav-link:hover {
+                 color: var(--bc-blue-dark) !important;
+                 background: linear-gradient( 135deg, rgba(37, 99, 235, .08), rgba(8, 145, 178, .05) );
+                 box-shadow: 0 4px 12px rgba(37, 99, 235, .08);
+                 transform: translateY(-1px);
+             }
+
+                 #mainNavbar .nav-link:hover i {
+                     color: var(--bc-blue);
+                     transform: translateY(-1px);
+                 }
+
+
+             /* Active */
+
+             #mainNavbar .nav-link.active {
+                 color: var(--bc-blue-dark) !important;
+                 background: linear-gradient( 135deg, rgba(37, 99, 235, .10), rgba(8, 145, 178, .06) );
+                 box-shadow: inset 0 0 0 1px rgba(37, 99, 235, .08), 0 4px 12px rgba(37, 99, 235, .07);
+             }
+
+                 #mainNavbar .nav-link.active i {
+                     color: var(--bc-blue);
+                 }
+
+
+                 /* Active underline */
+
+                 #mainNavbar .nav-link.active::after {
+                     content: "";
+                     position: absolute;
+                     left: 50%;
+                     bottom: 3px;
+                     width: 22px;
+                     height: 2px;
+                     transform: translateX(-50%);
+                     border-radius: 20px;
+                     background: linear-gradient( 90deg, var(--bc-blue), var(--bc-cyan-light) );
+                 }
+
+
+         /* =========================================================
+    NAVBAR BUTTONS
+    ========================================================= */
+
+         #mainNavbar .btn {
+             border-radius: 10px;
+             font-weight: 600;
+             transition: transform .25s ease, box-shadow .25s ease, background .25s ease;
+         }
+
+             #mainNavbar .btn:hover {
+                 transform: translateY(-1px);
+                 box-shadow: 0 7px 18px rgba(37, 99, 235, .18);
+             }
+
+         #mainNavbar .btn-primary {
+             border: none;
+             background: linear-gradient( 135deg, var(--bc-primary), var(--bc-blue) );
+             box-shadow: 0 5px 14px rgba(37, 99, 235, .18);
+         }
+
+             #mainNavbar .btn-primary:hover {
+                 background: linear-gradient( 135deg, var(--bc-primary-dark), var(--bc-blue-dark) );
+             }
+
+
+         /* =========================================================
+    DROPDOWN
+    ========================================================= */
+
+         #mainNavbar .dropdown-menu {
+             margin-top: 8px;
+             padding: 8px;
+             border: 1px solid var(--glass-border);
+             border-radius: 14px;
+             background: rgba(255, 255, 255, .97);
+             backdrop-filter: blur(18px);
+             -webkit-backdrop-filter: blur(18px);
+             box-shadow: 0 18px 45px rgba(15, 23, 42, .12);
+         }
+
+         #mainNavbar .dropdown-item {
+             padding: 9px 12px;
+             border-radius: 9px;
+             color: var(--bc-text);
+             font-size: .88rem;
+             transition: background .2s ease, color .2s ease, transform .2s ease;
+         }
+
+             #mainNavbar .dropdown-item:hover {
+                 color: var(--bc-blue-dark);
+                 background: rgba(37, 99, 235, .07);
+                 transform: translateX(2px);
+             }
+
+
+     /* =========================================================
+    HEADER SEARCH
+    ========================================================= */
+
+     .hdr-search-wrap {
+         position: relative;
+         flex: 1 1 auto;
+         width: 100%;
+         max-width: 380px;
+         margin: 0 12px;
+     }
+
+     .hdr-search-group {
+         display: flex;
+         align-items: center;
+         gap: 8px;
+         width: 100%;
+         padding: 6px 13px;
+         border-radius: 30px;
+         background: rgba(255, 255, 255, .78);
+         border: 1px solid rgba(37, 99, 235, .16);
+         box-shadow: 0 3px 12px rgba(15, 23, 42, .04);
+         transition: border-color .25s ease, box-shadow .25s ease, background .25s ease;
+     }
+
+         .hdr-search-group:hover {
+             background: rgba(255, 255, 255, .92);
+             border-color: rgba(37, 99, 235, .25);
+         }
+
+         .hdr-search-group:focus-within {
+             background: #fff;
+             border-color: var(--bc-blue);
+             box-shadow: 0 0 0 3px rgba(37, 99, 235, .10), 0 6px 18px rgba(37, 99, 235, .08);
+         }
+
+         .hdr-search-group i.bi-search {
+             color: var(--bc-blue);
+             font-size: .95rem;
+         }
+
+     #hdrSearchInput {
+         flex-grow: 1;
+         width: 100%;
+         border: none;
+         outline: none;
+         background: transparent;
+         font-family: 'Poppins', sans-serif;
+         font-size: .86rem;
+         color: var(--bc-text);
+     }
+
+         #hdrSearchInput::placeholder {
+             color: #94A3B8;
+         }
+
+     #hdrSearchSpinner {
+         display: none;
+         color: var(--bc-blue);
+         animation: hdrSpin .8s linear infinite;
+     }
+
+     @@keyframes hdrSpin {
+         from {
+             transform: rotate(0deg);
+         }
+
+         to {
+             transform: rotate(360deg);
+         }
+     }
+
+
+     /* =========================================================
+    SEARCH RESULTS
+    ========================================================= */
+
+     .hdr-search-results {
+         position: absolute;
+         top: calc(100% + 9px);
+         left: 0;
+         right: 0;
+         z-index: 1045;
+         max-height: 420px;
+         overflow-y: auto;
+         padding: 8px;
+         background: rgba(255, 255, 255, .98);
+         border: 1px solid rgba(37, 99, 235, .12);
+         border-radius: 14px;
+         box-shadow: 0 18px 45px rgba(15, 23, 42, .14);
+         display: none;
+     }
+
+         .hdr-search-results::-webkit-scrollbar {
+             width: 5px;
+         }
+
+         .hdr-search-results::-webkit-scrollbar-thumb {
+             background: #CBD5E1;
+             border-radius: 20px;
+         }
+
+     .hs-section-title {
+         margin: 10px 6px 4px;
+         font-size: .68rem;
+         font-weight: 700;
+         text-transform: uppercase;
+         letter-spacing: .06em;
+         color: var(--bc-blue);
+     }
+
+     .hs-item {
+         display: block;
+         padding: 8px 10px;
+         border-radius: 10px;
+         text-decoration: none;
+         color: var(--bc-text);
+     }
+
+         .hs-item:hover {
+             background: rgba(37, 99, 235, .07);
+             color: var(--bc-blue-dark);
+         }
+
+         .hs-item .hs-title {
+             font-size: .86rem;
+             font-weight: 600;
+         }
+
+         .hs-item .hs-subtitle {
+             font-size: .72rem;
+             color: var(--bc-text-soft);
+         }
+
+     .hs-empty,
+     .hs-hint {
+         padding: 14px 8px;
+         text-align: center;
+         color: var(--bc-text-soft);
+         font-size: .8rem;
+     }
+
+
+     /* =========================================================
+    USER PROFILE
+    ========================================================= */
+
+     .user-profile-link {
+         display: inline-flex;
+         align-items: center;
+         gap: 10px;
+         min-width: 0;
+         max-width: 230px;
+         padding: 5px 9px 5px 6px;
+         margin-left: 6px;
+         border: 1px solid rgba(37, 99, 235, .12);
+         border-radius: 16px;
+         background: rgba(255, 255, 255, .70);
+         color: var(--bc-text) !important;
+         text-decoration: none !important;
+         box-shadow: 0 4px 14px rgba(15, 23, 42, .06);
+         transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease;
+     }
+
+         .user-profile-link:hover {
+             transform: translateY(-1px);
+             border-color: rgba(37, 99, 235, .28);
+             background: rgba(255, 255, 255, .95);
+             box-shadow: 0 8px 22px rgba(37, 99, 235, .12);
+         }
+
+     .user-profile-avatar,
+     .user-profile-initial {
+         width: 38px;
+         height: 38px;
+         min-width: 38px;
+         border-radius: 50%;
+         object-fit: cover;
+         border: 2px solid #fff;
+         box-shadow: 0 4px 10px rgba(37, 99, 235, .18);
+     }
+
+     .user-profile-initial {
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         background: linear-gradient( 135deg, var(--bc-primary), var(--bc-blue), var(--bc-cyan) );
+         color: #fff;
+         font-size: .85rem;
+         font-weight: 700;
+     }
+
+     .user-profile-text {
+         min-width: 0;
+         line-height: 1.15;
+     }
+
+     .user-profile-name {
+         display: block;
+         max-width: 155px;
+         overflow: hidden;
+         text-overflow: ellipsis;
+         white-space: nowrap;
+         font-size: .82rem;
+         font-weight: 700;
+         color: var(--bc-text);
+     }
+
+     .user-profile-role {
+         display: block;
+         max-width: 155px;
+         overflow: hidden;
+         text-overflow: ellipsis;
+         white-space: nowrap;
+         margin-top: 2px;
+         font-size: .68rem;
+         font-weight: 600;
+         color: var(--bc-blue);
+     }
+
+     .user-profile-chevron {
+         margin-left: 2px;
+         color: var(--bc-blue);
+         font-size: .75rem;
+     }
+
+
+     /* =========================================================
+    LEFT SIDEBAR
+    ========================================================= */
+
+     #sideNav {
+         position: fixed;
+         top: 66px;
+         left: 0;
+         bottom: 0;
+         width: var(--sidebar-w);
+         z-index: 1020;
+         overflow-x: hidden;
+         overflow-y: auto;
+         background: rgba(255, 255, 255, .88);
+         backdrop-filter: blur(16px);
+         -webkit-backdrop-filter: blur(16px);
+         border-right: 1px solid var(--glass-border);
+         box-shadow: 4px 0 20px rgba(15, 23, 42, .06);
+         transition: width .25s ease, box-shadow .25s ease;
+     }
+
+         #sideNav:hover,
+         #sideNav.pinned-open {
+             width: var(--sidebar-w-open);
+             box-shadow: 7px 0 28px rgba(15, 23, 42, .10);
+         }
+
+         #sideNav::-webkit-scrollbar {
+             width: 4px;
+         }
+
+         #sideNav::-webkit-scrollbar-thumb {
+             background: #CBD5E1;
+             border-radius: 20px;
+         }
+
+
+     /* Sidebar link */
+
+     .side-link {
+         display: flex;
+         align-items: center;
+         gap: 14px;
+         padding: 12px 20px;
+         color: var(--bc-text);
+         text-decoration: none;
+         font-size: .9rem;
+         font-weight: 500;
+         white-space: nowrap;
+         border-left: 3px solid transparent;
+         transition: background .2s ease, color .2s ease, border-color .2s ease, transform .2s ease;
+     }
+
+         .side-link i {
+             width: 22px;
+             flex-shrink: 0;
+             text-align: center;
+             font-size: 1.15rem;
+             color: var(--bc-blue);
+             transition: color .2s ease, transform .2s ease;
+         }
+
+         .side-link:hover {
+             color: var(--bc-blue-dark);
+             background: rgba(37, 99, 235, .06);
+             transform: translateX(2px);
+         }
+
+             .side-link:hover i {
+                 color: var(--bc-blue-dark);
+                 transform: translateX(1px);
+             }
+
+         .side-link.active {
+             color: var(--bc-blue-dark);
+             background: linear-gradient( 90deg, rgba(37, 99, 235, .11), rgba(8, 145, 178, .04) );
+             border-left-color: var(--bc-blue);
+             font-weight: 600;
+         }
+
+             .side-link.active i {
+                 color: var(--bc-blue-dark);
+             }
+
+
+     /* Sidebar section label */
+
+     .side-section-label {
+         padding: 16px 20px 4px;
+         font-size: .65rem;
+         font-weight: 700;
+         text-transform: uppercase;
+         letter-spacing: .08em;
+         color: var(--bc-text-soft);
+         white-space: nowrap;
+         opacity: 0;
+         transition: opacity .2s ease;
+     }
+
+     #sideNav:hover .side-section-label,
+     #sideNav.pinned-open .side-section-label {
+         opacity: 1;
+     }
+
+
+     /* =========================================================
+    CONTENT AREA
+    ========================================================= */
+
+     #contentWrap {
+         margin-left: var(--sidebar-w);
+         min-height: calc(100vh - 66px);
+         transition: margin-left .25s ease;
+     }
+
+     #mainContent.ajax-loading {
+         opacity: .5;
+         pointer-events: none;
+         transition: opacity .2s ease;
+     }
+
+
+     /* =========================================================
+    GLASS CARD
+    ========================================================= */
+
+     .glass-card {
+         background: var(--glass-bg);
+         backdrop-filter: blur(12px);
+         -webkit-backdrop-filter: blur(12px);
+         border: 1px solid var(--glass-border);
+         border-radius: 18px;
+         box-shadow: 0 8px 30px rgba(15, 23, 42, .08);
+         transition: transform .25s ease, box-shadow .25s ease;
+     }
+
+         .glass-card:hover {
+             box-shadow: 0 14px 38px rgba(15, 23, 42, .11);
+         }
+
+
+     /* =========================================================
+    BACK TO TOP
+    ========================================================= */
+
+     #backToTopBtn {
+         position: fixed;
+         right: 24px;
+         bottom: 24px;
+         z-index: 1030;
+         display: none;
+         width: 46px;
+         height: 46px;
+         border: none;
+         border-radius: 50%;
+         background: linear-gradient( 145deg, #FFFFFF, #EAF2FF );
+         color: var(--bc-blue);
+         box-shadow: 6px 6px 14px rgba(37, 99, 235, .18), -6px -6px 14px rgba(255, 255, 255, .95);
+         transition: transform .2s ease, box-shadow .2s ease;
+     }
+
+         #backToTopBtn:hover {
+             transform: translateY(-3px);
+             box-shadow: 0 10px 24px rgba(37, 99, 235, .20);
+         }
+
+         #backToTopBtn:active {
+             transform: translateY(0);
+             box-shadow: inset 4px 4px 8px rgba(37, 99, 235, .18), inset -4px -4px 8px rgba(255, 255, 255, .9);
+         }
+
+
+     /* =========================================================
+    FOOTER
+    ========================================================= */
+
+     footer {
+         color: var(--bc-text-soft);
+     }
+
+     .site-footer {
+         position: relative;
+         margin-top: 60px;
+         overflow: hidden;
+         background: linear-gradient( 135deg, #0B2850 0%, #123C73 45%, #075985 100% );
+         color: #fff;
+     }
+
+         .site-footer::before,
+         .site-footer::after {
+             content: "";
+             position: absolute;
+             border-radius: 50%;
+             pointer-events: none;
+         }
+
+         .site-footer::before {
+             width: 280px;
+             height: 280px;
+             top: -140px;
+             right: -80px;
+             background: rgba(34, 211, 238, .08);
+         }
+
+         .site-footer::after {
+             width: 220px;
+             height: 220px;
+             bottom: -120px;
+             left: -80px;
+             background: rgba(37, 99, 235, .10);
+         }
+
+
+     /* Footer main */
+
+     .footer-main {
+         position: relative;
+         z-index: 2;
+         display: grid;
+         grid-template-columns: 2fr 1fr 1.5fr 1.2fr;
+         gap: 45px;
+         padding: 55px 0 40px;
+     }
+
+
+     /* Footer logo */
+
+     .footer-logo {
+         display: flex;
+         align-items: center;
+         gap: 12px;
+         margin-bottom: 18px;
+         font-size: 22px;
+         font-weight: 700;
+     }
+
+     .footer-logo-icon {
+         width: 42px;
+         height: 42px;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         border-radius: 12px;
+         background: linear-gradient( 135deg, var(--bc-cyan-light), var(--bc-blue) );
+         color: #fff;
+         box-shadow: 0 8px 20px rgba(0, 0, 0, .18);
+     }
+
+
+     /* Footer description */
+
+     .footer-description {
+         max-width: 390px;
+         margin-bottom: 20px;
+         color: rgba(255, 255, 255, .78);
+         font-size: 14px;
+         line-height: 1.8;
+     }
+
+     .footer-version {
+         display: flex;
+         align-items: center;
+         gap: 8px;
+         color: #BAE6FD;
+         font-size: 12px;
+     }
+
+     .version-dot {
+         color: var(--bc-cyan-light);
+     }
+
+
+     /* Footer columns */
+
+     .footer-column h5 {
+         position: relative;
+         margin: 0 0 20px;
+         padding-bottom: 10px;
+         font-size: 16px;
+         font-weight: 700;
+     }
+
+         .footer-column h5::after {
+             content: "";
+             position: absolute;
+             left: 0;
+             bottom: 0;
+             width: 35px;
+             height: 2px;
+             border-radius: 5px;
+             background: var(--bc-cyan-light);
+         }
+
+
+     /* Footer links */
+
+     .footer-links,
+     .footer-contact {
+         list-style: none;
+         padding: 0;
+         margin: 0;
+     }
+
+         .footer-links li {
+             margin-bottom: 11px;
+         }
+
+         .footer-links a {
+             color: rgba(255, 255, 255, .75);
+             text-decoration: none;
+             font-size: 14px;
+             transition: color .25s ease, padding .25s ease;
+         }
+
+             .footer-links a i {
+                 margin-right: 7px;
+                 color: var(--bc-cyan-light);
+                 font-size: 11px;
+             }
+
+             .footer-links a:hover {
+                 color: #fff;
+                 padding-left: 5px;
+             }
+
+
+         /* Footer contact */
+
+         .footer-contact li {
+             display: flex;
+             align-items: flex-start;
+             gap: 12px;
+             margin-bottom: 17px;
+         }
+
+     .contact-icon {
+         width: 34px;
+         height: 34px;
+         min-width: 34px;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         border-radius: 9px;
+         background: rgba(255, 255, 255, .10);
+         color: var(--bc-cyan-light);
+     }
+
+     .footer-contact small {
+         display: block;
+         margin-bottom: 3px;
+         color: rgba(255, 255, 255, .55);
+         font-size: 11px;
+     }
+
+     .footer-contact a,
+     .footer-contact div > span {
+         color: rgba(255, 255, 255, .85);
+         text-decoration: none;
+         font-size: 13px;
+         word-break: break-word;
+     }
+
+         .footer-contact a:hover {
+             color: var(--bc-cyan-light);
+         }
+
+
+     /* Social */
+
+     .social-text {
+         color: rgba(255, 255, 255, .70);
+         font-size: 13px;
+         line-height: 1.7;
+     }
+
+     .footer-social {
+         display: flex;
+         gap: 10px;
+         margin: 20px 0;
+     }
+
+     .social-btn {
+         width: 40px;
+         height: 40px;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         border-radius: 11px;
+         color: #fff;
+         background: rgba(255, 255, 255, .10);
+         border: 1px solid rgba(255, 255, 255, .10);
+         text-decoration: none;
+         transition: transform .25s ease, background .25s ease, color .25s ease;
+     }
+
+         .social-btn:hover {
+             transform: translateY(-4px);
+             background: rgba(255, 255, 255, .20);
+             color: #fff;
+         }
+
+     .footer-support {
+         display: inline-flex;
+         align-items: center;
+         gap: 8px;
+         padding: 9px 13px;
+         border-radius: 9px;
+         background: rgba(255, 255, 255, .08);
+         color: #BAE6FD;
+         font-size: 12px;
+     }
+
+         .footer-support i {
+             color: var(--bc-cyan-light);
+         }
+
+
+     /* =========================================================
+    FOOTER BOTTOM
+    ========================================================= */
+
+     .footer-bottom {
+         position: relative;
+         z-index: 2;
+         min-height: 65px;
+         display: flex;
+         align-items: center;
+         justify-content: space-between;
+         gap: 20px;
+         border-top: 1px solid rgba(255, 255, 255, .12);
+         color: rgba(255, 255, 255, .60);
+         font-size: 12px;
+     }
+
+     .copyright strong {
+         color: #fff;
+     }
+
+     .footer-bottom-right {
+         display: flex;
+         align-items: center;
+         gap: 10px;
+     }
+
+     .bottom-separator {
+         color: rgba(255, 255, 255, .25);
+     }
+
+
+     /* =========================================================
+    RESPONSIVE — TABLET
+    ========================================================= */
+
+     @@media (max-width: 1100px) {
+
+         #mainNavbar {
+             padding-left: 12px;
+             padding-right: 12px;
+         }
+
+             #mainNavbar .nav-link {
+                 padding-left: 9px;
+                 padding-right: 9px;
+                 font-size: .84rem;
+             }
+
+         .hdr-search-wrap {
+             max-width: 300px;
+             margin-left: 8px;
+             margin-right: 8px;
+         }
+
+         .user-profile-link {
+             max-width: 200px;
+         }
+     }
+
+
+     /* =========================================================
+    RESPONSIVE — MOBILE NAVBAR
+    ========================================================= */
+
+     @@media (max-width: 991px) {
+
+         #mainNavbar {
+             padding: 8px 12px;
+         }
+
+             #mainNavbar .navbar-collapse {
+                 margin-top: 10px;
+                 padding: 10px;
+                 border-radius: 14px;
+                 background: rgba(255, 255, 255, .97);
+                 border: 1px solid var(--glass-border);
+                 box-shadow: 0 12px 32px rgba(15, 23, 42, .10);
+             }
+
+             #mainNavbar .nav-link {
+                 width: 100%;
+                 margin: 2px 0;
+                 padding: 10px 12px;
+             }
+
+                 #mainNavbar .nav-link.active::after {
+                     display: none;
+                 }
+
+                 #mainNavbar .nav-link.active {
+                     box-shadow: inset 3px 0 0 var(--bc-blue), 0 3px 10px rgba(37, 99, 235, .06);
+                 }
+
+         .hdr-search-wrap {
+             max-width: 100%;
+         }
+     }
+
+
+     /* =========================================================
+    RESPONSIVE — MOBILE
+    ========================================================= */
+
+     @@media (max-width: 767.98px) {
+
+         body {
+             padding-top: 62px;
+         }
+
+         #mainNavbar {
+             min-height: 62px;
+         }
+
+         .hdr-search-wrap {
+             display: none;
+         }
+
+         .user-profile-link {
+             width: 100%;
+             max-width: 100%;
+             margin: 8px 0;
+             justify-content: flex-start;
+         }
+
+         .user-profile-name,
+         .user-profile-role {
+             max-width: 220px;
+         }
+         /* Sidebar */
+
+         #sideNav {
+             top: 62px;
+             width: 0;
+             border-right: none;
+         }
+
+             #sideNav:hover,
+             #sideNav.pinned-open {
+                 width: var(--sidebar-w-open);
+                 box-shadow: 6px 0 25px rgba(15, 23, 42, .16);
+             }
+
+         #contentWrap {
+             margin-left: 0;
+         }
+         /* Back to top */
+
+         #backToTopBtn {
+             right: 16px;
+             bottom: 16px;
+             width: 42px;
+             height: 42px;
+         }
+     }
+
+
+     /* =========================================================
+    RESPONSIVE — FOOTER
+    ========================================================= */
+
+     @@media (max-width: 992px) {
+
+         .footer-main {
+             grid-template-columns: 1fr 1fr;
+             gap: 35px;
+         }
+     }
+
+     @@media (max-width: 576px) {
+
+         .footer-main {
+             grid-template-columns: 1fr;
+             gap: 30px;
+             padding: 40px 20px 30px;
+         }
+
+         .footer-bottom {
+             margin: 0 20px;
+             padding: 18px 0;
+             flex-direction: column;
+             text-align: center;
+         }
+
+         .footer-bottom-right {
+             flex-wrap: wrap;
+             justify-content: center;
+         }
+
+         .footer-description {
+             max-width: 100%;
+         }
+     }
+
+
+     /* =========================================================
+    SMALL POLISH
+    ========================================================= */
+
+     ::selection {
+         background: rgba(37, 99, 235, .18);
+         color: var(--bc-primary-dark);
+     }
+
+     img {
+         max-width: 100%;
+     }
+
+     .text-primary {
+         color: var(--bc-blue) !important;
+     }
+
+     .bg-primary {
+         background-color: var(--bc-primary) !important;
+     }
+
+     .border-primary {
+         border-color: var(--bc-blue) !important;
+     }
+
+     .btn-primary {
+         background: linear-gradient( 135deg, var(--bc-primary), var(--bc-blue) );
+         border-color: transparent;
+     }
+
+         .btn-primary:hover {
+             background: linear-gradient( 135deg, var(--bc-primary-dark), var(--bc-blue-dark) );
+             border-color: transparent;
+         }
+
+
+    /* =========================================================
+   NAVBAR ACTIONS
+========================================================= */
+
+    .nav-action-btn {
+        width: 42px;
+        height: 42px;
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px !important;
+        color: var(--bc-primary) !important;
+        transition: background .2s ease, color .2s ease, transform .2s ease;
+    }
+
+        .nav-action-btn:hover {
+            background: var(--bc-blue-soft) !important;
+            color: var(--bc-blue) !important;
+            transform: translateY(-1px);
+        }
+
+        .nav-action-btn i {
+            font-size: 18px;
+        }
+
+
+    /* =========================================================
+   BADGE
+========================================================= */
+
+    .nav-badge {
+        position: absolute;
+        top: 2px;
+        right: 1px;
+        min-width: 18px;
+        height: 18px;
+        padding: 0 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50px;
+        background: #EF4444;
+        color: white;
+        font-size: 10px;
+        font-weight: 700;
+        border: 2px solid white;
+    }
+
+
+    /* =========================================================
+   NOTIFICATION / MESSAGE DROPDOWN
+========================================================= */
+
+    .notification-menu,
+    .message-menu {
+        width: 370px;
+        padding: 0 !important;
+        border: 1px solid rgba(15, 23, 42, .08) !important;
+        border-radius: 16px !important;
+        overflow: hidden;
+        box-shadow: 0 20px 50px rgba(15, 23, 42, .16);
+        background: #fff;
+    }
+
+
+    /* Header */
+
+    .notification-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 18px;
+        border-bottom: 1px solid #E5E7EB;
+    }
+
+        .notification-header strong {
+            display: block;
+            font-size: 14px;
+            color: #0F172A;
+        }
+
+        .notification-header small {
+            display: block;
+            margin-top: 2px;
+            color: #64748B;
+            font-size: 11px;
+        }
+
+        .notification-header button {
+            padding: 0;
+            font-size: 11px;
+            text-decoration: none;
+            color: var(--bc-blue);
+        }
+
+
+    /* =========================================================
+   NOTIFICATION ITEM
+========================================================= */
+
+    .notification-item {
+        display: flex;
+        gap: 12px;
+        padding: 13px 16px;
+        text-decoration: none !important;
+        border-bottom: 1px solid #F1F5F9;
+        transition: background .2s ease;
+    }
+
+        .notification-item:hover {
+            background: #F8FAFC;
+        }
+
+        .notification-item.unread {
+            background: #EFF6FF;
+        }
+
+    .notification-icon {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 11px;
+        background: #EFF6FF;
+        color: #2563EB;
+    }
+
+    .notification-content {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .notification-title {
+        color: #0F172A;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 3px;
+    }
+
+    .notification-text {
+        color: #64748B;
+        font-size: 11px;
+        line-height: 1.45;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .notification-time {
+        margin-top: 4px;
+        color: #94A3B8;
+        font-size: 10px;
+    }
+
+
+    /* =========================================================
+   MESSAGE ITEM
+========================================================= */
+
+    .message-item {
+        display: flex;
+        gap: 11px;
+        padding: 13px 16px;
+        text-decoration: none !important;
+        border-bottom: 1px solid #F1F5F9;
+        transition: background .2s ease;
+    }
+
+        .message-item:hover {
+            background: #F8FAFC;
+        }
+
+        .message-item.unread {
+            background: #F0FDFA;
+        }
+
+    .message-avatar {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: linear-gradient( 135deg, #123C73, #2563EB );
+        color: white;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .message-content {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .message-sender {
+        color: #0F172A;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .message-text {
+        color: #64748B;
+        font-size: 11px;
+        margin-top: 2px;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .message-time {
+        margin-top: 4px;
+        color: #94A3B8;
+        font-size: 10px;
+    }
+
+
+    /* =========================================================
+   FOOTER
+========================================================= */
+
+    .notification-footer {
+        padding: 12px;
+        text-align: center;
+        background: #F8FAFC;
+    }
+
+        .notification-footer a {
+            color: var(--bc-blue);
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+            .notification-footer a:hover {
+                text-decoration: underline;
+            }
+
+    
+    /* =========================================================
+   MESSENGER FOOTER LINK
+========================================================= */
+    .message-open-link {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        min-height: 34px;
+        padding: 7px 14px;
+        color: var(--bc-blue) !important;
+        font-size: 12px;
+        font-weight: 600;
+        text-decoration: none !important;
+        border-radius: 9px;
+        transition: all .2s ease;
+    }
+
+    .message-open-link:hover {
+        color: var(--bc-blue-dark) !important;
+        background: rgba(37, 99, 235, .08);
+    }
+
+
+    /* =========================================================
+   MESSAGE UNREAD BADGE
+========================================================= */
+
+    .message-unread-badge {
+        position: absolute;
+        top: -5px;
+        right: -7px;
+        min-width: 20px;
+        height: 20px;
+        padding: 0 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #EF4444;
+        color: #fff;
+        border-radius: 50px;
+        font-size: 10px;
+        font-weight: 700;
+        line-height: 1;
+        border: 2px solid #fff;
+        box-shadow: 0 3px 8px rgba(239, 68, 68, .25);
+    }
+
+
+    /* Dark mode */
+
+    body.dark-mode .message-open-link {
+        color: #60A5FA !important;
+    }
+
+        body.dark-mode .message-open-link:hover {
+            color: #93C5FD !important;
+            background: rgba(96, 165, 250, .10);
+        }
+
+    body.dark-mode .message-unread-badge {
+        border-color: #0F172A;
+    }
+
+
+    /* Mobile */
+
+    @@media (max-width: 767px) {
+
+        .message-open-link {
+            width: 100%;
+            min-height: 38px;
+        }
+
+        .message-unread-badge {
+            top: -3px;
+            right: 20px;
+        }
+    }
+
+    
+    /* =========================================================
+   LOADING / EMPTY
+========================================================= */
+    .notification-loading,
+    .notification-empty {
+        padding: 28px 15px;
+        text-align: center;
+        color: #94A3B8;
+        font-size: 12px;
+    }
+
+        .notification-loading i {
+            display: block;
+            margin-bottom: 6px;
+            animation: navSpin 1s linear infinite;
+        }
+
+    @@keyframes navSpin {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+
+    /* =========================================================
+   DARK MODE
+========================================================= */
+
+    body.dark-mode .notification-menu,
+    body.dark-mode .message-menu {
+        background: #0F172A !important;
+        border-color: #334155 !important;
+        box-shadow: 0 20px 50px rgba(0,0,0,.45);
+    }
+
+    body.dark-mode .notification-header {
+        border-color: #334155;
+    }
+
+        body.dark-mode .notification-header strong {
+            color: #F8FAFC;
+        }
+
+        body.dark-mode .notification-header small {
+            color: #94A3B8;
+        }
+
+    body.dark-mode .notification-item,
+    body.dark-mode .message-item {
+        border-color: #1E293B;
+    }
+
+        body.dark-mode .notification-item:hover,
+        body.dark-mode .message-item:hover {
+            background: #1E293B;
+        }
+
+        body.dark-mode .notification-item.unread {
+            background: #172554;
+        }
+
+        body.dark-mode .message-item.unread {
+            background: #042F2E;
+        }
+
+    body.dark-mode .notification-title,
+    body.dark-mode .message-sender {
+        color: #F8FAFC;
+    }
+
+    body.dark-mode .notification-text,
+    body.dark-mode .message-text {
+        color: #CBD5E1;
+    }
+
+    body.dark-mode .notification-time,
+    body.dark-mode .message-time {
+        color: #64748B;
+    }
+
+    body.dark-mode .notification-footer {
+        background: #020617;
+    }
+
+    body.dark-mode .notification-loading,
+    body.dark-mode .notification-empty {
+        color: #64748B;
+    }
+
+    body.dark-mode .nav-badge {
+        border-color: #0F172A;
+    }
+
+
+    /* =========================================================
+   MOBILE
+========================================================= */
+
+    @@media (max-width: 767px) {
+
+        .notification-menu,
+        .message-menu {
+            width: calc(100vw - 30px);
+            max-width: 370px;
+            margin-right: 8px;
+        }
+
+        .nav-action-btn {
+            width: 40px;
+            height: 40px;
+        }
+        .message-unread-badge {
+            position: absolute;
+            top: -8px;
+            right: -10px;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #dc3545;
+            color: #fff;
+            border-radius: 50px;
+            font-size: 10px;
+            font-weight: 700;
+            line-height: 1;
+            border: 2px solid #fff;
+        }
+    }
+    
+</style>
+
+</head>
+<body>
+    @{
+        bool isLoggedIn = User.Identity.IsAuthenticated;
+        bool isCustomer = isLoggedIn && User.IsInRole("Customer");
+        bool isStaff = isLoggedIn && !isCustomer;
+        bool canViewDashboard = false;
+        CustomAuthentication.Models.User currentLayoutUser = null;
+        string currentLayoutInitial = "U";
+        if (isLoggedIn)
+        {
+            using (var layoutDb = new CustomAuthentication.Data.AppDbContext())
+            {
+                currentLayoutUser = layoutDb.Users.FirstOrDefault(x => x.Email == User.Identity.Name);
+
+                if (currentLayoutUser != null && !string.IsNullOrWhiteSpace(currentLayoutUser.FullName))
+                {
+                    currentLayoutInitial = currentLayoutUser.FullName.Trim().Substring(0, 1).ToUpper();
+                }
+
+                if (isStaff)
+                {
+                    canViewDashboard = CustomAuthentication.Helpers.PermissionHelper.HasPermission(layoutDb, User, "CanViewDashboard");
+                }
+            }
+        }
+    }
+
+    <nav id="mainNavbar" class="navbar navbar-expand-lg">
+        <div class="container-fluid d-flex align-items-center">
+
+            <a class="navbar-brand me-2" href="@Url.Content("~/")">
+                <i class="bi bi-flower2"></i> BeautyCenter <span style="color:var(--bc-purple)">BD</span>
+            </a>
+
+            @if (isLoggedIn)
+            {
+                <div class="hdr-search-wrap d-none d-md-block">
+                    <div class="hdr-search-group">
+                        <i class="bi bi-search"></i>
+                        <input type="text" id="hdrSearchInput" autocomplete="off" placeholder="Search..." />
+                        <span id="hdrSearchSpinner"><i class="bi bi-arrow-repeat"></i></span>
+                    </div>
+                    <div class="hdr-search-results" id="hdrSearchResults"></div>
+                </div>
+            }
+
+            <button class="navbar-toggler border-0 ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+                <i class="bi bi-list" style="font-size:1.6rem;color:var(--bc-purple)"></i>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navMenu">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
+                    <li class="nav-item"><a class="nav-link ajax-nav-link" href="@Url.Action("Index", "Home")"><i class="bi bi-shop"></i> Shop</a></li>
+
+                    @if (canViewDashboard)
+                    {
+                        <li class="nav-item"><a class="nav-link ajax-nav-link" href="@Url.Action("Dashboard", "Admin")"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                    }
+
+                    @if (!isLoggedIn || isCustomer)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link position-relative" href="@Url.Action("Cart", "Shop")">
+                                <i class="bi bi-cart3"></i> Cart
+                                @{ var cartCount = (CustomAuthentication.ViewModel.Cart)Session["ShoppingCart"]; }
+                                @if (cartCount != null && cartCount.TotalItems > 0)
+                                {
+                                    <span class="badge rounded-pill" style="background:linear-gradient(90deg,var(--bc-primary-soft),var(--bc-purple));position:absolute;top:0;right:-6px;font-size:.65rem;">@cartCount.TotalItems</span>
+                                }
+                            </a>
+                        </li>
+                    }
+
+
+                    @if (isCustomer)
+                    {
+                        <li class="nav-item"><a class="nav-link ajax-nav-link" href="@Url.Action("MyOrders", "Shop")"><i class="bi bi-bag-check"></i> My Orders</a></li>
+                    }
+
+
+
+                    <!-- SHOP -->
+                    <li class="nav-item">
+                        <a class="nav-link ajax-nav-link"
+                           href="@Url.Action("Index", "Home")">
+                            <i class="bi bi-shop"></i> Shop
+                        </a>
+                    </li>
+
+
+                    @if (isLoggedIn)
+                    {
+                        <!-- ================= NOTIFICATION ================= -->
+                        <li class="nav-item dropdown">
+
+                            <a class="nav-link nav-action-btn position-relative"
+                               href="#"
+                               id="notificationDropdown"
+                               role="button"
+                               data-bs-toggle="dropdown"
+                               aria-expanded="false">
+
+                                <i class="bi bi-bell"></i>
+
+                                <span id="notificationBadge"
+                                      class="nav-badge"
+                                      style="display:none;">
+                                    0
+                                </span>
+                            </a>
+
+                            <div class="dropdown-menu dropdown-menu-end notification-menu"
+                                 aria-labelledby="notificationDropdown">
+
+                                <div class="notification-header">
+                                    <div>
+                                        <strong>Notifications</strong>
+                                        <small id="notificationCountText">
+                                            No new notifications
+                                        </small>
+                                    </div>
+
+                                    <button type="button"
+                                            id="markAllNotifications"
+                                            class="btn btn-sm btn-link">
+                                        Mark all read
+                                    </button>
+                                </div>
+
+                                <div id="notificationList">
+
+                                    <div class="notification-loading">
+                                        <i class="bi bi-arrow-repeat"></i>
+                                        Loading...
+                                    </div>
+
+                                </div>
+
+                                <div class="notification-footer">
+                                    <a href="@Url.Action("Index", "Notification")">
+                                        View all notifications
+                                    </a>
+                                </div>
+
+                            </div>
+                        </li>
+
+
+                        <!-- ================= MESSAGE ================= -->
+                        <li class="nav-item dropdown">
+
+                            <a class="nav-link nav-action-btn position-relative"
+                               href="@Url.Action("Index", "Message")"
+                               id="messageDropdown"
+                               role="button"
+                               data-bs-toggle="dropdown"
+                               aria-expanded="false">
+
+                                <i class="bi bi-chat-dots"></i>
+
+                                <span id="messageBadge"
+                                      class="nav-badge"
+                                      style="display:none;">
+                                    0
+                                </span>
+                            </a>
+
+                            <div class="dropdown-menu dropdown-menu-end message-menu"
+                                 aria-labelledby="messageDropdown">
+
+                                <div class="notification-header">
+                                    <div>
+                                        <strong>Messages</strong>
+                                        <small id="messageCountText">
+                                            No new messages
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <div id="messageList">
+
+                                    <div class="notification-loading">
+                                        <i class="bi bi-arrow-repeat"></i>
+                                        Loading...
+                                    </div>
+
+                                </div>
+
+                                
+                                
+                                
+
+
+                            </div>
+                        </li>
+
+
+                        <!-- ================= THEME TOGGLE ================= -->
+                        <li class="nav-item">
+
+                            <button type="button"
+                                    id="themeToggle"
+                                    class="nav-link nav-action-btn theme-toggle"
+                                    title="Toggle light/dark mode">
+
+                                <i class="bi bi-moon-stars-fill"
+                                   id="themeIcon"></i>
+
+                            </button>
+
+                        </li>
+                    }
+
+                    @if (isLoggedIn)
+                    {
+                        <li class="nav-item">
+                            <a class="user-profile-link" href="@Url.Action("Profile", "Account")" title="Open my profile">
+                                @if (currentLayoutUser != null && !string.IsNullOrWhiteSpace(currentLayoutUser.ImagePath))
+                                {
+                                    <img class="user-profile-avatar" src="@Url.Content(currentLayoutUser.ImagePath)" alt="@currentLayoutUser.FullName" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                    <span class="user-profile-initial" style="display:none;">@currentLayoutInitial</span>
+                                }
+                                else
+                                {
+                                    <span class="user-profile-initial">@currentLayoutInitial</span>
+                                }
+                                <span class="user-profile-text">
+                                    <span class="user-profile-name">@(currentLayoutUser != null ? currentLayoutUser.FullName : User.Identity.Name)</span>
+                                    <span class="user-profile-role">@(currentLayoutUser != null ? currentLayoutUser.RoleName : "User")</span>
+                                </span>
+                                <i class="bi bi-chevron-down user-profile-chevron"></i>
+                            </a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item"><a class="nav-link" href="@Url.Action("Login", "Account")"><i class="bi bi-box-arrow-in-right"></i> Login</a></li>
+                        <li class="nav-item"><a class="nav-link" href="@Url.Action("Register", "Account")"><i class="bi bi-person-plus"></i> Register</a></li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    @if (isStaff)
+    {
+        @Html.Partial("_SideNav")
+    }
+
+    <div id="contentWrap" style="@(isStaff ? "" : "margin-left:0;")">
+        <div class="container-fluid px-3 px-md-4 py-3" id="mainContent">
+            @RenderBody()
+        </div>
+
+    </div>
+
+    <!--------------------->
+    <!-------Footer-------->
+
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-main">
+
+                <div class="footer-column footer-brand">
+                    <div class="footer-logo">
+                        <span class="footer-logo-icon">
+                            <i class="bi bi-shop-window"></i>
+                        </span>
+                        <span>BeautyCenterBD</span>
+                    </div>
+
+                    <p class="footer-description">
+                        BeautyCenterBD is a professional cosmetics and beauty
+                        products platform designed to make shopping and business
+                        management simple, secure and efficient.
+                    </p>
+
+                    <div class="footer-version">
+                        <span>Version 1.0.0</span>
+                        <span class="version-dot">-</span>
+                        <span>Professional Edition</span>
+                    </div>
+                </div>
+
+                <div class="footer-column">
+                    <h5>Company</h5>
+                    <ul class="footer-links">
+                        <li><a href="@Url.Action("Index", "Home")"><i class="bi bi-chevron-right"></i> Home</a></li>
+                        <li><a href="@Url.Action("About", "Home")"><i class="bi bi-chevron-right"></i> About Us</a></li>
+                        <li><a href="@Url.Action("Contact", "Home")"><i class="bi bi-chevron-right"></i> Contact Us</a></li>
+                        <li><a href="#"><i class="bi bi-chevron-right"></i> Privacy Policy</a></li>
+                        <li><a href="#"><i class="bi bi-chevron-right"></i> Terms &amp; Conditions</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-column">
+                    <h5>Contact</h5>
+                    <ul class="footer-contact">
+                        <li>
+                            <span class="contact-icon"><i class="bi bi-envelope-fill"></i></span>
+                            <div>
+                                <small>Email</small>
+                                <a href="beautycenterbd07@gmail.com">beautycenterbd07@gmail.com</a>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="contact-icon"><i class="bi bi-whatsapp"></i></span>
+                            <div>
+                                <small>WhatsApp</small>
+                                <a href="https://wa.me/01787600733" target="_blank" rel="noopener">01787-600733</a>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="contact-icon"><i class="bi bi-telephone-fill"></i></span>
+                            <div>
+                                <small>Phone</small>
+                                <a href="tel:+8801787-600733">+8801787-600733</a>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="contact-icon"><i class="bi bi-geo-alt-fill"></i></span>
+                            <div>
+                                <small>Address</small>
+                                <span>Zigatola,Dhanmondi,Dhaka, Bangladesh</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="footer-column">
+                    <h5>Follow Us</h5>
+                    <p class="social-text">Stay connected with BeautyCenterBD.</p>
+
+                    <div class="footer-social">
+                        <a href="https://www.facebook.com/BeautyCenterBDOfficial" target="_blank" rel="noopener" class="social-btn" aria-label="Facebook">
+                            <i class="bi bi-facebook"></i>
+                        </a>
+                        <a href="https://wa.me/01787600733" target="_blank" rel="noopener" class="social-btn" aria-label="WhatsApp">
+                            <i class="bi bi-whatsapp"></i>
+                        </a>
+                        <a href="beautycenterbd07@gmail.com" class="social-btn" aria-label="Email">
+                            <i class="bi bi-envelope-fill"></i>
+                        </a>
+                        <a href="tel:+8801787-600733" class="social-btn" aria-label="Phone">
+                            <i class="bi bi-telephone-fill"></i>
+                        </a>
+                    </div>
+
+                    <div class="footer-support">
+                        <i class="bi bi-headset"></i>
+                        <span>Customer Support</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="footer-bottom">
+                <div class="copyright">
+                    &copy; @DateTime.Now.Year <strong>BeautyCenterBD</strong>. All Rights Reserved.
+                </div>
+
+                <div class="footer-bottom-right">
+                    <span>Developed for BeautyCenterBD</span>
+                    <span class="bottom-separator">|</span>
+                    <span>v1.0.0</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+
+
+    <button id="backToTopBtn" title="Back to top">
+        <i class="bi bi-arrow-up"></i>
+    </button>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+
+    <script>
+        $(function () {
+            var $toTop = $('#backToTopBtn');
+
+            $(window).on('scroll', function () {
+                var current = $(window).scrollTop();
+                if (current > 300) {
+                    $toTop.fadeIn(150);
+                } else {
+                    $toTop.fadeOut(150);
+                }
+            });
+
+            $toTop.on('click', function () {
+                $('html, body').animate({ scrollTop: 0 }, 300);
+            });
+
+            // =========================================================
+            // Header search (compact) - same /Search/Global endpoint
+            // used by the shop's search box.
+            // =========================================================
+            var $input = $('#hdrSearchInput');
+            var $results = $('#hdrSearchResults');
+            var $spinner = $('#hdrSearchSpinner');
+            var debounceTimer = null;
+            var currentRequest = null;
+
+            function escapeHtml(str) {
+                var div = document.createElement("div");
+                div.innerText = str == null ? "" : str;
+                return div.innerHTML;
+            }
+
+            function sectionIcon(key) {
+                if (key === "Products") return "bi-box-seam";
+                if (key === "Orders") return "bi-bag-check";
+                if (key === "Users") return "bi-people";
+                return "bi-dot";
+            }
+
+            function renderSection(key, items) {
+                if (!items || items.length === 0) return "";
+                var html = '<div class="hs-section-title"><i class="bi ' + sectionIcon(key) + ' me-1"></i>' + escapeHtml(key) + '</div>';
+                items.forEach(function (item) {
+                    html += '<a class="hs-item ajax-nav-link" href="' + item.url + '">' +
+                        '<div class="hs-title">' + escapeHtml(item.title) + '</div>' +
+                        '<div class="hs-subtitle">' + escapeHtml(item.subtitle) + '</div>' +
+                        '</a>';
+                });
+                return html;
+            }
+
+            function showResults(data) {
+                var html = "";
+                html += renderSection("Products", data.products);
+                html += renderSection("Orders", data.orders);
+                html += renderSection("Users", data.users);
+
+                if (!html) {
+                    html = '<div class="hs-empty">No results found.</div>';
+                }
+
+                $results.html(html);
+                $results.show();
+            }
+
+            if ($input.length) {
+                $input.on('input', function () {
+                    var term = $input.val().trim();
+                    clearTimeout(debounceTimer);
+
+                    if (term.length < 2) {
+                        $results.hide();
+                        return;
+                    }
+
+                    debounceTimer = setTimeout(function () {
+                        if (currentRequest) { currentRequest.abort(); }
+                        $spinner.show();
+
+                        currentRequest = $.get('@Url.Action("Global", "Search")', { q: term })
+                            .done(function (data) {
+                                showResults(data);
+                            })
+                            .always(function () {
+                                $spinner.hide();
+                            });
+                    }, 300);
+                });
+
+                $(document).on('click', function (e) {
+                    if (!$(e.target).closest('.hdr-search-wrap').length) {
+                        $results.hide();
+                    }
+                });
+            }
+
+            // =========================================================
+            // Sidebar: pin open on click (tap) for touch devices,
+            // hover already expands it on desktop via CSS.
+            // =========================================================
+            $('#sideNav').on('click', function (e) {
+                if ($(window).width() < 768 && e.target === this) {
+                    $(this).toggleClass('pinned-open');
+                }
+            });
+
+            // =========================================================
+            // AJAX content loading (pjax-style): clicking a sidebar or
+            // top-nav link fetches the target page and swaps only the
+            // #mainContent portion into the current page, so the
+            // header/sidebar never reload. Falls back to a normal
+            // full page navigation if anything goes wrong.
+            // =========================================================
+            function loadPage(url, pushState) {
+                var $content = $('#mainContent');
+                $content.addClass('ajax-loading');
+
+                $.get(url)
+                    .done(function (html) {
+                        var parsedDoc = new DOMParser().parseFromString(html, 'text/html');
+                        var newContentEl = parsedDoc.getElementById('mainContent');
+
+                        if (!newContentEl) {
+                            // Target page doesn't use this layout (e.g. a
+                            // standalone page) - do a full navigation instead.
+                            window.location.href = url;
+                            return;
+                        }
+
+                        $content.html(newContentEl.innerHTML);
+                        $content.removeClass('ajax-loading');
+
+                        if (parsedDoc.title) {
+                            document.title = parsedDoc.title;
+                        }
+
+                        // The layout renders each page's own @@section
+                        // Scripts block AFTER #contentWrap (near the end
+                        // of <body>), so it lives outside #mainContent.
+                        // Re-run every <script> on the fetched page that
+                        // isn't one of the shared CDN/layout scripts, so
+                        // page-specific behaviour (image previews,
+                        // dynamic rows, infinite scroll, etc.) still
+                        // works after an AJAX navigation.
+                        var sharedScriptSrc = ['bootstrap', 'jquery', 'modernizr', 'cdn.jsdelivr.net'];
+
+                        parsedDoc.querySelectorAll('script').forEach(function (oldScript) {
+                            var src = oldScript.getAttribute('src') || '';
+                            var isShared = sharedScriptSrc.some(function (marker) {
+                                return src.indexOf(marker) !== -1;
+                            });
+
+                            if (isShared) {
+                                return;
+                            }
+
+                            var newScript = document.createElement('script');
+                            if (src) {
+                                newScript.src = src;
+                            } else {
+                                newScript.textContent = oldScript.textContent;
+                            }
+                            document.body.appendChild(newScript);
+                            if (src) {
+                                // Inline scripts run immediately on append;
+                                // external ones are one-shot too - remove
+                                // once loaded so repeat navigations don't
+                                // pile up duplicate <script> tags.
+                                newScript.onload = function () { newScript.remove(); };
+                            } else {
+                                newScript.remove();
+                            }
+                        });
+
+                        if (pushState) {
+                            window.history.pushState({ ajaxUrl: url }, '', url);
+                        }
+
+                        $('.side-link, .ajax-nav-link').removeClass('active');
+                        $('.side-link[href="' + url + '"]').addClass('active');
+
+                        window.scrollTo(0, 0);
+                    })
+                    .fail(function () {
+                        window.location.href = url;
+                    });
+            }
+
+            $(document).on('click', '.ajax-nav-link, .side-link', function (e) {
+                var href = $(this).attr('href');
+
+                if (!href || href.charAt(0) === '#' || $(this).attr('target') === '_blank') {
+                    return;
+                }
+
+                e.preventDefault();
+                loadPage(href, true);
+            });
+
+            window.addEventListener('popstate', function (e) {
+                if (e.state && e.state.ajaxUrl) {
+                    loadPage(e.state.ajaxUrl, false);
+                } else {
+                    window.location.reload();
+                }
+            });
+
+            // Mark the current sidebar link active on first load.
+            var currentPath = window.location.pathname.toLowerCase();
+            $('.side-link').each(function () {
+                var linkPath = $(this).attr('href');
+                if (linkPath && linkPath.toLowerCase() === currentPath) {
+                    $(this).addClass('active');
+                }
+            });
+        });
+
+
+
+       
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const themeToggle = document.getElementById("themeToggle");
+        const themeIcon = document.getElementById("themeIcon");
+
+        if (!themeToggle || !themeIcon) return;
+
+
+        /* ==========================================
+           LOAD SAVED THEME
+           ========================================== */
+
+        const savedTheme = localStorage.getItem("bc-theme");
+
+        if (savedTheme === "dark") {
+            document.body.classList.add("dark-mode");
+
+            themeIcon.classList.remove("bi-moon-stars-fill");
+            themeIcon.classList.add("bi-sun-fill");
+        }
+
+
+        /* ==========================================
+           TOGGLE THEME
+           ========================================== */
+
+        themeToggle.addEventListener("click", function () {
+
+            document.body.classList.toggle("dark-mode");
+
+            const isDark =
+                document.body.classList.contains("dark-mode");
+
+
+            if (isDark) {
+
+                themeIcon.classList.remove(
+                    "bi-moon-stars-fill"
+                );
+
+                themeIcon.classList.add(
+                    "bi-sun-fill"
+                );
+
+                localStorage.setItem(
+                    "bc-theme",
+                    "dark"
+                );
+
+            } else {
+
+                themeIcon.classList.remove(
+                    "bi-sun-fill"
+                );
+
+                themeIcon.classList.add(
+                    "bi-moon-stars-fill"
+                );
+
+                localStorage.setItem(
+                    "bc-theme",
+                    "light"
+                );
+            }
+
+        });
+
+    });
+
+
+
+    function updateMessageUnreadCount() {
+
+        $.ajax({
+
+            url: '@Url.Action("UnreadCount", "Message")',
+
+            type: 'GET',
+
+            cache: false,
+
+            success: function (response) {
+
+                if (!response || !response.success) {
+                    return;
+                }
+
+                const badge = $("#messageUnreadBadge");
+
+                const count = parseInt(response.count) || 0;
+
+                if (count > 0) {
+
+                    badge.text(
+                        count > 99 ? "99+" : count
+                    );
+
+                    badge.show();
+
+                }
+                else {
+
+                    badge.hide();
+
+                }
+
+            },
+
+            error: function () {
+
+                console.log(
+                    "Unable to load unread message count."
+                );
+
+            }
+
+        });
+
+    }
+
+
+    // First load
+    $(document).ready(function () {
+
+        updateMessageUnreadCount();
+
+    });
+
+
+    // Refresh every 5 seconds
+    setInterval(function () {
+
+        updateMessageUnreadCount();
+
+    }, 5000);
+
+    
+
+    </script>
+
+</body>
+</html>
+

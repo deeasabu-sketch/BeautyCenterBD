@@ -1,0 +1,91 @@
+﻿@model CustomAuthentication.ViewModel.PromoCodeViewModel
+@{ ViewBag.Title = "New Promo Code"; }
+<style>
+    .glass-card {
+        background: rgba(255,255,255,.55);
+        backdrop-filter: blur(14px);
+        border: 1px solid rgba(255,255,255,.6);
+        border-radius: 20px;
+        box-shadow: 0 8px 32px rgba(124,58,237,.15);
+    }
+
+    .title-grad {
+        background: linear-gradient(90deg,#3B82F6,#7C3AED);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .frm-control, .frm-control:focus {
+        background: rgba(255,255,255,.7);
+        border: 1px solid rgba(124,58,237,.25);
+        box-shadow: none;
+    }
+
+    .lbl {
+        color: #24324A;
+        font-weight: 600;
+    }
+
+    .btn-glass {
+        border: none;
+        border-radius: 10px;
+        padding: 10px 22px;
+        background: linear-gradient(90deg,#3B82F6,#7C3AED);
+        color: #fff;
+        font-weight: 600;
+    }
+</style>
+<div class="container py-5">
+    @Html.Partial("_BackBar", new List<CustomAuthentication.ViewModel.BackBarLink>
+    {
+        new CustomAuthentication.ViewModel.BackBarLink("Dashboard", "Admin", "Dashboard"),
+        new CustomAuthentication.ViewModel.BackBarLink("Promo Codes", "PromoCode", "Index")
+    })
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="glass-card p-4 p-md-5">
+                <h3 class="fw-bold title-grad mb-4"><i class="bi bi-tag me-2"></i>New Promo Code</h3>
+                @using (Html.BeginForm())
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.Code, new { @class = "form-label lbl" })
+                        @Html.TextBoxFor(m => m.Code, new { @class = "form-control frm-control", placeholder = "e.g. EID2026", style = "text-transform:uppercase;" })
+                        @Html.ValidationMessageFor(m => m.Code, "", new { @class = "text-danger small" })
+                    </div>
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.Description, "Description (ticker-e ei text dekhabe)", new { @class = "form-label lbl" })
+                        @Html.TextBoxFor(m => m.Description, new { @class = "form-control frm-control", placeholder = "e.g. Eid Special - 15% off" })
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            @Html.LabelFor(m => m.DiscountPercent, "Discount %", new { @class = "form-label lbl" })
+                            @Html.TextBoxFor(m => m.DiscountPercent, new { @class = "form-control frm-control", type = "number", step = "0.01" })
+                            @Html.ValidationMessageFor(m => m.DiscountPercent, "", new { @class = "text-danger small" })
+                        </div>
+                        <div class="col-md-6">
+                            @Html.LabelFor(m => m.MinOrderAmount, "Minimum Order (Taka, optional)", new { @class = "form-label lbl" })
+                            @Html.TextBoxFor(m => m.MinOrderAmount, new { @class = "form-control frm-control", type = "number", step = "0.01" })
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        @Html.LabelFor(m => m.ExpiryDate, "Expiry Date (optional)", new { @class = "form-label lbl" })
+                        @Html.TextBoxFor(m => m.ExpiryDate, "{0:yyyy-MM-dd}", new { @class = "form-control frm-control", type = "date" })
+                    </div>
+                    <div class="form-check form-switch mb-4">
+                        @Html.CheckBoxFor(m => m.IsActive, new { @class = "form-check-input" })
+                        @Html.LabelFor(m => m.IsActive, "Active", new { @class = "form-check-label" })
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="@Url.Action("Index")" class="btn btn-light">Cancel</a>
+                        <button type="submit" class="btn-glass">Save</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

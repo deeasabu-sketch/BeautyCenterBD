@@ -1,0 +1,327 @@
+﻿
+
+@*
+    Shared global search box.
+    Include with: @Html.Partial("_GlobalSearch")
+    Searches Products / Orders / Users via /Search/Global,
+    filtered server-side by the logged-in user's permissions.
+*@
+
+<div class="gsearch-bar">
+    <div class="gsearch-inner">
+        <div class="gsearch-input-group">
+            <i class="bi bi-search"></i>
+            <input type="text" id="gsInput" autocomplete="off"
+                   placeholder="Search products, orders or users..." />
+            <span id="gsSpinner"><i class="bi bi-arrow-repeat"></i></span>
+            <button type="button" id="gsClear" class="gsearch-clear" title="Clear" style="display:none;">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+
+        <div class="gsearch-results" id="gsResults">
+            <div class="gs-hint">Type at least 2 characters to search products, orders or users.</div>
+        </div>
+    </div>
+</div>
+
+
+<style>
+    
+
+
+
+
+    .gsearch-bar {
+        width: 100%;
+        padding: 14px 0;
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(160, 108, 255, 0.12);
+    }
+
+    .gsearch-inner {
+        position: relative;
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 0 16px;
+    }
+
+    .gsearch-input-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 4px 8px 4px 18px;
+        border-radius: 30px;
+        background: #ffffff;
+        border: 1px solid rgba(160, 108, 255, 0.25);
+        box-shadow: 0 2px 10px rgba(124,58,237,0.08);
+        transition: box-shadow .2s ease, border-color .2s ease;
+    }
+
+        .gsearch-input-group:focus-within {
+            border-color: #7C3AED;
+            box-shadow: 0 4px 16px rgba(124,58,237,0.18);
+        }
+
+        .gsearch-input-group i.bi-search {
+            color: #7C3AED;
+            font-size: 1.05rem;
+        }
+
+    #gsInput {
+        flex-grow: 1;
+        border: none;
+        background: transparent;
+        outline: none;
+        font-family: 'Poppins', sans-serif;
+        font-size: .95rem;
+        padding: 10px 0;
+        color: #24324A;
+    }
+
+    #gsSpinner {
+        display: none;
+        color: #7C3AED;
+        animation: gsSpin 0.8s linear infinite;
+    }
+
+    @@keyframes gsSpin {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .gsearch-clear {
+        border: none;
+        background: transparent;
+        color: #64748B;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: .8rem;
+    }
+
+        .gsearch-clear:hover {
+            background: rgba(124,58,237,0.12);
+            color: #7C3AED;
+        }
+
+    .gsearch-results {
+        position: absolute;
+        top: calc(100% + 10px);
+        left: 16px;
+        right: 16px;
+        max-height: 440px;
+        overflow-y: auto;
+        z-index: 1040;
+        padding: 10px;
+        background: #ffffff;
+        border-radius: 16px;
+        border: 1px solid rgba(124,58,237,0.15);
+        box-shadow: 0 16px 40px rgba(90, 50, 150, 0.18);
+        display: none;
+    }
+
+    .gs-section-title {
+        font-size: .72rem;
+        text-transform: uppercase;
+        letter-spacing: .07em;
+        font-weight: 700;
+        color: #7C3AED;
+        margin: 12px 8px 6px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+        .gs-section-title:first-child {
+            margin-top: 4px;
+        }
+
+    .gs-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        border-radius: 12px;
+        text-decoration: none;
+        color: #24324A;
+    }
+
+        .gs-item:hover {
+            background: rgba(124,58,237,0.10);
+            color: #24324A;
+        }
+
+        .gs-item .gs-title {
+            font-weight: 600;
+            font-size: .92rem;
+        }
+
+        .gs-item .gs-subtitle {
+            font-size: .76rem;
+            color: #64748B;
+            margin-top: 1px;
+        }
+
+        .gs-item .badge {
+            flex-shrink: 0;
+            font-weight: 500;
+        }
+
+    .gs-empty, .gs-hint, .gs-denied {
+        text-align: center;
+        color: #64748B;
+        font-size: .85rem;
+        padding: 20px 10px;
+    }
+
+        .gs-denied i {
+            color: #d9a3a3;
+        }
+</style>
+
+<script>
+    (function () {
+        var $input = document.getElementById("gsInput");
+        var $results = document.getElementById("gsResults");
+        var $spinner = document.getElementById("gsSpinner");
+        var $clear = document.getElementById("gsClear");
+        var debounceTimer = null;
+        var currentRequest = null;
+
+        function escapeHtml(str) {
+            var div = document.createElement("div");
+            div.innerText = str == null ? "" : str;
+            return div.innerHTML;
+        }
+
+        function sectionIcon(key) {
+            if (key === "Products") return "bi-box-seam";
+            if (key === "Orders") return "bi-bag-check";
+            if (key === "Users") return "bi-people";
+            return "bi-dot";
+        }
+
+        function renderSection(key, items) {
+            if (!items || items.length === 0) return "";
+
+            var html = '<div class="gs-section-title"><i class="bi ' + sectionIcon(key) + '"></i>' + escapeHtml(key) + '</div>';
+
+            items.forEach(function (item) {
+                html += '<a class="gs-item" href="' + item.url + '">' +
+                    '<div>' +
+                    '<div class="gs-title">' + escapeHtml(item.title) + '</div>' +
+                    '<div class="gs-subtitle">' + escapeHtml(item.subtitle) + '</div>' +
+                    '</div>' +
+                    (item.badge ? '<span class="badge bg-light text-dark border">' + escapeHtml(item.badge) + '</span>' : '') +
+                    '</a>';
+            });
+
+            return html;
+        }
+
+        function showResults(data) {
+            var html = "";
+
+            html += renderSection("Products", data.products);
+            html += renderSection("Orders", data.orders);
+            html += renderSection("Users", data.users);
+
+            if (!html) {
+                html = '<div class="gs-empty"><i class="bi bi-emoji-frown d-block mb-1" style="font-size:1.4rem;"></i>' +
+                    'No results found for "' + escapeHtml(data.query) + '".</div>';
+            }
+
+            $results.innerHTML = html;
+            $results.style.display = "block";
+        }
+
+        function runSearch(term) {
+            if (currentRequest) {
+                currentRequest.abort();
+            }
+
+            $spinner.style.display = "inline-block";
+
+            currentRequest = new XMLHttpRequest();
+            currentRequest.open("GET", '@Url.Action("Global", "Search")' + '?q=' + encodeURIComponent(term), true);
+
+            currentRequest.onload = function () {
+                $spinner.style.display = "none";
+
+                if (currentRequest.status === 200) {
+                    try {
+                        var data = JSON.parse(currentRequest.responseText);
+                        showResults(data);
+                    } catch (e) {
+                        $results.innerHTML = '<div class="gs-empty">Something went wrong. Please try again.</div>';
+                        $results.style.display = "block";
+                    }
+                } else if (currentRequest.status === 401 || currentRequest.status === 403) {
+                    $results.innerHTML = '<div class="gs-denied"><i class="bi bi-shield-lock d-block mb-1" style="font-size:1.3rem;"></i>You are not authorized to search.</div>';
+                    $results.style.display = "block";
+                }
+            };
+
+            currentRequest.onerror = function () {
+                $spinner.style.display = "none";
+            };
+
+            currentRequest.send();
+        }
+
+        $input.addEventListener("input", function () {
+            var term = $input.value.trim();
+
+            $clear.style.display = term.length > 0 ? "flex" : "none";
+
+            clearTimeout(debounceTimer);
+
+            if (term.length < 2) {
+                $results.innerHTML = '<div class="gs-hint">Type at least 2 characters to search products, orders or users.</div>';
+                $results.style.display = term.length > 0 ? "block" : "none";
+                return;
+            }
+
+            debounceTimer = setTimeout(function () {
+                runSearch(term);
+            }, 300);
+        });
+
+        $input.addEventListener("focus", function () {
+            if ($input.value.trim().length >= 2) {
+                $results.style.display = "block";
+            }
+        });
+
+        $clear.addEventListener("click", function () {
+            $input.value = "";
+            $clear.style.display = "none";
+            $results.style.display = "none";
+            $input.focus();
+        });
+
+        document.addEventListener("click", function (e) {
+            if (!e.target.closest(".gsearch-inner")) {
+                $results.style.display = "none";
+            }
+        });
+
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape") {
+                $results.style.display = "none";
+            }
+        });
+    })();
+</script>

@@ -1,0 +1,213 @@
+﻿@model CustomAuthentication.ViewModel.LoginViewModel
+
+@{
+    ViewBag.Title = "Login";
+}
+
+<style>
+    .lg-glass {
+        background: rgba(255,255,255,0.55);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border: 1px solid rgba(255,255,255,0.6);
+        border-radius: 22px;
+        box-shadow: 0 8px 32px rgba(124,58,237,0.15);
+    }
+    .lg-header {
+        text-align: center;
+        padding: 34px 24px 26px;
+    }
+    .lg-icon-circle {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        margin: 0 auto 12px;
+        display: flex; align-items: center; justify-content: center;
+        background: linear-gradient(90deg,#3B82F6,#7C3AED);
+        color: #fff;
+        font-size: 1.8rem;
+        box-shadow: 0 8px 20px rgba(124,58,237,0.3);
+    }
+    .lg-title-grad {
+        background: linear-gradient(90deg,#3B82F6,#7C3AED);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .lg-form-control, .lg-form-control:focus {
+        background: rgba(255,255,255,0.7);
+        border: 1px solid rgba(124,58,237,0.25);
+        box-shadow: none;
+    }
+    .lg-form-control:focus {
+        border-color: #7C3AED;
+        box-shadow: 0 0 0 0.2rem rgba(124,58,237,0.15);
+    }
+    .lg-input-icon {
+        background: rgba(255,255,255,0.6);
+        border: 1px solid rgba(124,58,237,0.25);
+        border-right: none;
+        color: #7C3AED;
+    }
+    .lg-btn {
+        border: none; border-radius: 12px; padding: 12px;
+        background: linear-gradient(90deg,#3B82F6,#7C3AED); color:#fff; font-weight:700;
+        box-shadow: 4px 4px 12px rgba(124,58,237,0.3);
+    }
+    .lg-btn:hover { color:#fff; opacity:.92; }
+    .lg-btn-ghost {
+        border: none; border-radius: 12px; padding: 10px 22px;
+        background: linear-gradient(145deg,#ffffff,#EDE9FE); color:#7C3AED; font-weight:600;
+        box-shadow: 4px 4px 10px rgba(124,58,237,0.15), -4px -4px 10px rgba(255,255,255,0.9);
+    }
+    .lg-btn-ghost:hover { color:#7C3AED; text-decoration:none; }
+    .lg-back {
+        color:#64748B;
+        text-decoration:none;
+    }
+    .lg-back:hover { color:#7C3AED; }
+</style>
+
+<div class="container py-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-5 col-md-7 col-sm-10">
+
+            <!-- Back to Home -->
+            <div class="mb-3">
+                <a href="@Url.Action("Index", "Home")" class="lg-back">
+                    <i class="bi bi-arrow-left me-1"></i> Back to Home
+                </a>
+            </div>
+
+            <!-- Login Card -->
+            <div class="lg-glass overflow-hidden">
+
+                <!-- Header -->
+                <div class="lg-header">
+                    <div class="lg-icon-circle">
+                        <i class="bi bi-person-circle"></i>
+                    </div>
+
+                    <h2 class="fw-bold mb-1 lg-title-grad">Welcome Back</h2>
+                    <p class="mb-0" style="color:#64748B;">Login to your account</p>
+                </div>
+
+
+                <!-- Body -->
+                <div class="p-4 p-md-5 pt-0">
+
+                    @using (Html.BeginForm(
+                        "Login",
+                        "Account",
+                        FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        @Html.ValidationSummary(
+                            true,
+                            "",
+                            new { @class = "alert alert-danger" }
+                        )
+
+
+                        <!-- Email -->
+                        <div class="mb-4">
+                            @Html.LabelFor(m => m.Email, new { @class = "form-label fw-semibold", style = "color:#24324A;" })
+
+                            <div class="input-group">
+                                <span class="input-group-text lg-input-icon">
+                                    <i class="bi bi-envelope-fill"></i>
+                                </span>
+
+                                @Html.TextBoxFor(
+                                    m => m.Email,
+                                    new
+                                    {
+                                        @class = "form-control lg-form-control",
+                                        type = "email",
+                                        placeholder = "Enter your email"
+                                    }
+                                )
+                            </div>
+
+                            @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger small" })
+                        </div>
+
+
+                        <!-- Password -->
+                        <div class="mb-3">
+                            @Html.LabelFor(m => m.Password, new { @class = "form-label fw-semibold", style = "color:#24324A;" })
+
+                            <div class="input-group">
+                                <span class="input-group-text lg-input-icon">
+                                    <i class="bi bi-lock-fill"></i>
+                                </span>
+
+                                @Html.PasswordFor(
+                                    m => m.Password,
+                                    new
+                                    {
+                                        @class = "form-control lg-form-control",
+                                        placeholder = "Enter your password"
+                                    }
+                                )
+                            </div>
+
+                            @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger small" })
+                        </div>
+
+
+                        <!-- Remember Me -->
+                        <div class="form-check mb-4">
+                            <input type="checkbox"
+                                   class="form-check-input"
+                                   id="RememberMe"
+                                   name="RemeberMe"
+                                   value="true" />
+
+                            <label class="form-check-label" for="RememberMe" style="color:#24324A;">
+                                Remember Me
+                            </label>
+                        </div>
+
+
+                        <!-- Login Button -->
+                        <div class="d-grid">
+                            <button type="submit" class="lg-btn">
+                                <i class="bi bi-box-arrow-in-right me-2"></i> Login
+                            </button>
+                        </div>
+
+                    }
+
+
+                    <!-- Register Section -->
+                    <div class="text-center mt-4">
+
+                        <div class="position-relative mb-3">
+                            <hr style="border-color:rgba(124,58,237,0.2);" />
+                            <span class="position-absolute top-50 start-50 translate-middle px-3 small"
+                                  style="background:#fdf6ff;color:#64748B;">
+                                OR
+                            </span>
+                        </div>
+
+                        <p class="mb-2" style="color:#64748B;">Don't have an account?</p>
+
+                        <a href="@Url.Action("Register", "Account")" class="lg-btn-ghost">
+                            <i class="bi bi-person-plus-fill me-2"></i> Create an Account
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

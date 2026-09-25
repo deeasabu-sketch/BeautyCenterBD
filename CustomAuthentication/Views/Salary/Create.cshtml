@@ -1,0 +1,66 @@
+﻿@model CustomAuthentication.ViewModel.SalaryViewModel
+@{ ViewBag.Title = "Add Salary"; }
+<style>
+.glass-card{background:rgba(255,255,255,.55);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.6);border-radius:20px;box-shadow:0 8px 32px rgba(124,58,237,.15);}
+.title-grad{background:linear-gradient(90deg,#3B82F6,#7C3AED);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.frm-control,.frm-control:focus{background:rgba(255,255,255,.7);border:1px solid rgba(124,58,237,.25);box-shadow:none;}
+.lbl{color:#24324A;font-weight:600;}
+.btn-glass{border:none;border-radius:10px;padding:10px 22px;background:linear-gradient(90deg,#3B82F6,#7C3AED);color:#fff;font-weight:600;}
+.btn-ghost{border:none;border-radius:10px;padding:10px 22px;background:linear-gradient(145deg,#ffffff,#EDE9FE);color:#7C3AED;font-weight:600;}
+.btn-ghost:hover{color:#7C3AED;text-decoration:none;}
+</style>
+<div class="container py-5">
+    @Html.Partial("_BackBar", new List<CustomAuthentication.ViewModel.BackBarLink>
+    {
+        new CustomAuthentication.ViewModel.BackBarLink("Dashboard", "Admin", "Dashboard"),
+        new CustomAuthentication.ViewModel.BackBarLink("Salaries", "Salary", "Index")
+    })
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="glass-card p-4 p-md-5">
+                <h3 class="fw-bold title-grad mb-4"><i class="bi bi-cash-stack me-2"></i>Add Salary Record</h3>
+                @using (Html.BeginForm())
+                {
+                    @Html.AntiForgeryToken()
+                    @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+                    <div class="mb-3">
+                        @Html.Label("UserId", "Employee", new { @class = "form-label lbl" })
+                        @Html.DropDownListFor(m => m.UserId, Model.UserOptions, "-- Select Employee --", new { @class = "form-select frm-control" })
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            @Html.Label("SalaryMonth", "Month", new { @class = "form-label lbl" })
+                            @Html.DropDownListFor(m => m.SalaryMonth, Model.MonthOptions, new { @class = "form-select frm-control" })
+                        </div>
+                        <div class="col-md-6">
+                            @Html.LabelFor(m => m.SalaryYear, new { @class = "form-label lbl" })
+                            @Html.TextBoxFor(m => m.SalaryYear, new { @class = "form-control frm-control", type = "number" })
+                        </div>
+                    </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            @Html.LabelFor(m => m.BasicSalary, new { @class = "form-label lbl" })
+                            @Html.TextBoxFor(m => m.BasicSalary, new { @class = "form-control frm-control", type = "number", step = "0.01" })
+                        </div>
+                        <div class="col-md-4">
+                            @Html.LabelFor(m => m.Bonus, new { @class = "form-label lbl" })
+                            @Html.TextBoxFor(m => m.Bonus, new { @class = "form-control frm-control", type = "number", step = "0.01" })
+                        </div>
+                        <div class="col-md-4">
+                            @Html.LabelFor(m => m.Deduction, new { @class = "form-label lbl" })
+                            @Html.TextBoxFor(m => m.Deduction, new { @class = "form-control frm-control", type = "number", step = "0.01" })
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        @Html.LabelFor(m => m.Remarks, new { @class = "form-label lbl" })
+                        @Html.TextAreaFor(m => m.Remarks, new { @class = "form-control frm-control", rows = "2" })
+                    </div>
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="@Url.Action("Index")" class="btn-ghost">Cancel</a>
+                        <button type="submit" class="btn-glass"><i class="bi bi-check-circle me-1"></i>Save</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

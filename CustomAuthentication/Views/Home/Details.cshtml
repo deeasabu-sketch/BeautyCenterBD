@@ -1,0 +1,104 @@
+﻿@model CustomAuthentication.Models.Product
+@{ ViewBag.Title = Model.ProductName; var related = ViewBag.RelatedProducts as System.Collections.Generic.List<CustomAuthentication.Models.Product>; }
+<style>
+.glass-card{background:rgba(255,255,255,.55);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.6);border-radius:20px;box-shadow:0 8px 32px rgba(124,58,237,.15);}
+.title-grad{background:linear-gradient(90deg,#3B82F6,#7C3AED);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.btn-glass{border:none;border-radius:10px;padding:10px 22px;background:linear-gradient(90deg,#3B82F6,#7C3AED);color:#fff;font-weight:600;}
+.btn-glass:hover{color:#fff;text-decoration:none;opacity:.92;}
+.btn-ghost{border:none;border-radius:10px;padding:10px 22px;background:linear-gradient(145deg,#ffffff,#EDE9FE);color:#7C3AED;font-weight:600;}
+.btn-ghost:hover{color:#7C3AED;text-decoration:none;}
+.main-img{width:100%;border-radius:18px;max-height:420px;object-fit:cover;}
+.main-img-placeholder{width:100%;height:320px;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#ffffff,#EDE9FE);color:#7C3AED;font-size:3rem;border-radius:18px;}
+.price-tag{font-size:1.6rem;font-weight:800;color:#7C3AED;}
+.old-price{text-decoration:line-through;color:#a3a3a3;}
+.mini-card{background:rgba(255,255,255,.55);border-radius:14px;overflow:hidden;text-decoration:none;display:block;}
+.mini-img{width:100%;height:110px;object-fit:cover;}
+</style>
+<div class="container py-4">
+    <a href="@Url.Action("Index")" class="btn-ghost mb-3 d-inline-block"><i class="bi bi-arrow-left me-1"></i>Back to Shop</a>
+
+    <div class="glass-card p-4">
+        <div class="row g-4">
+            <div class="col-md-5">
+                @if (!string.IsNullOrEmpty(Model.ImagePath))
+                {
+                    <img src="@Url.Content(Model.ImagePath)" class="main-img" alt="@Model.ProductName" />
+                }
+                else
+                {
+                    <div class="main-img-placeholder"><i class="bi bi-image"></i></div>
+                }
+            </div>
+            <div class="col-md-7">
+                <div style="color:#64748B;">@(Model.Category?.Name ?? "") @(Model.Brand != null ? " • " + Model.Brand.Name : "")</div>
+                <h2 class="fw-bold mb-2" style="color:#24324A;">@Model.ProductName</h2>
+
+                @{ decimal effectivePrice = Model.DiscountPercent > 0 ? Model.UnitPrice - (Model.UnitPrice * Model.DiscountPercent / 100m) : Model.UnitPrice; }
+                <div class="mb-3">
+                    <span class="price-tag">Taka @effectivePrice.ToString("N2")</span>
+                    @if (Model.DiscountPercent > 0)
+                    {
+                        <span class="old-price ms-2">Taka @Model.UnitPrice.ToString("N2")</span>
+                        <span class="badge bg-danger ms-1">-@Model.DiscountPercent%</span>
+                    }
+                    <span style="color:#64748B;"> / @(Model.Unit?.ShortCode ?? "pcs")</span>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.Description))
+                {
+                    <p style="color:#64748B;">@Model.Description</p>
+                }
+
+                <div class="mb-3">
+                    @if (Model.StockQuantity > 0)
+                    {
+                        <span class="badge bg-success">In Stock (@Model.StockQuantity available)</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Out of Stock</span>
+                    }
+                </div>
+
+                @if (Model.StockQuantity > 0)
+                {
+                    using (Html.BeginForm("AddToCart", "Shop", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="productId" value="@Model.ProductId" />
+                        <div class="d-flex align-items-center gap-3">
+                            <input type="number" name="quantity" value="1" min="1" max="@Model.StockQuantity" class="form-control" style="width:100px;border-radius:10px;" />
+                            <button type="submit" class="btn-glass"><i class="bi bi-cart-plus me-1"></i>Add to Cart</button>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+
+    @if (related != null && related.Any())
+    {
+        <h5 class="fw-bold mt-5 mb-3" style="color:#24324A;">Related Products</h5>
+        <div class="row g-3">
+            @foreach (var r in related)
+            {
+                <div class="col-6 col-md-3">
+                    <a href="@Url.Action("Details", new { id = r.ProductId })" class="mini-card">
+                        @if (!string.IsNullOrEmpty(r.ImagePath))
+                        {
+                            <img src="@Url.Content(r.ImagePath)" class="mini-img" />
+                        }
+                        else
+                        {
+                            <div class="mini-img d-flex align-items-center justify-content-center" style="background:linear-gradient(145deg,#ffffff,#EDE9FE);color:#7C3AED;"><i class="bi bi-image"></i></div>
+                        }
+                        <div class="p-2">
+                            <div class="fw-semibold small" style="color:#24324A;">@r.ProductName</div>
+                            <div class="small" style="color:#7C3AED;">Taka @r.UnitPrice.ToString("N2")</div>
+                        </div>
+                    </a>
+                </div>
+            }
+        </div>
+    }
+</div>

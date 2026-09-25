@@ -1,0 +1,486 @@
+﻿
+@model IEnumerable<CustomAuthentication.Models.Product>
+
+@{
+    ViewBag.Title = "Products";
+}
+
+<style>
+    .pr-glass {
+        background: rgba(255,255,255,0.55);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border: 1px solid rgba(255,255,255,0.6);
+        border-radius: 20px;
+        box-shadow: 0 8px 32px rgba(124,58,237,0.15);
+    }
+
+    .pr-title-grad {
+        background: linear-gradient(90deg,#3B82F6,#7C3AED);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .pr-btn {
+        border: none;
+        border-radius: 10px;
+        padding: 8px 16px;
+        background: linear-gradient(90deg,#3B82F6,#7C3AED);
+        color: #fff;
+        font-weight: 600;
+        text-decoration: none;
+        box-shadow: 4px 4px 10px rgba(124,58,237,0.25);
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .pr-btn:hover {
+        color: #fff;
+        opacity: .92;
+        text-decoration: none;
+    }
+
+    .pr-row {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 12px 16px;
+        border-radius: 14px;
+        background: rgba(255,255,255,0.5);
+        margin-bottom: 10px;
+        transition: box-shadow .2s ease, transform .15s ease;
+    }
+
+    .pr-row:hover {
+        box-shadow:
+            4px 4px 14px rgba(124,58,237,0.18),
+            -4px -4px 14px rgba(255,255,255,0.9);
+        transform: translateY(-1px);
+    }
+
+    .pr-thumb {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+        object-fit: cover;
+        flex-shrink: 0;
+        box-shadow: 2px 2px 6px rgba(124,58,237,0.15);
+    }
+
+    .pr-thumb-placeholder {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(145deg,#ffffff,#EDE9FE);
+        color: #7C3AED;
+        font-size: 1.3rem;
+    }
+
+    .pr-name {
+        font-weight: 600;
+        color: #24324A;
+    }
+
+    .pr-meta {
+        color: #64748B;
+        font-size: .82rem;
+    }
+
+    .pr-price {
+        font-weight: 700;
+        color: #7C3AED;
+        white-space: nowrap;
+    }
+
+    .pr-icon-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 9px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        background: linear-gradient(145deg,#ffffff,#EDE9FE);
+        box-shadow:
+            3px 3px 8px rgba(124,58,237,0.15),
+            -3px -3px 8px rgba(255,255,255,0.9);
+        color: #7C3AED;
+        margin-left: 4px;
+        flex-shrink: 0;
+        text-decoration: none;
+    }
+
+    .pr-icon-btn:hover {
+        color: #7C3AED;
+        text-decoration: none;
+        transform: translateY(-1px);
+    }
+
+    .pr-icon-btn.danger {
+        color: #3B82F6;
+    }
+
+    .pr-icon-btn.danger:hover {
+        color: #3B82F6;
+    }
+
+    .pr-list-wrap {
+        max-height: 72vh;
+        overflow-y: auto;
+        padding-right: 4px;
+    }
+
+    .pr-list-wrap::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .pr-list-wrap::-webkit-scrollbar-thumb {
+        background: #c5a9ed;
+        border-radius: 10px;
+    }
+
+    .pr-list-wrap::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    @@media (max-width: 768px) {
+        .pr-row {
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .pr-price {
+            margin-left: 66px;
+        }
+
+        .pr-actions {
+            margin-left: 66px;
+        }
+    }    .pr-stat-chip {
+        background: rgba(124,58,237,0.1);
+        color: #4C1D95;
+        font-weight: 600;
+        font-size: .82rem;
+        padding: 8px 14px;
+        border-radius: 30px;
+        white-space: nowrap;
+    }
+</style>
+
+
+<div class="py-2">
+
+    <!-- =========================================
+         HEADER
+    ========================================== -->
+
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+
+        <div>
+            <h2 class="fw-bold mb-1 pr-title-grad">
+                <i class="bi bi-bag-heart me-2"></i>
+                Products
+            </h2>
+
+            <p class="mb-0" style="color:#64748B;">
+                Manage your vendor products
+            </p>
+        </div>
+
+        <div class="d-flex gap-3 align-items-center">
+            <span class="pr-stat-chip"><i class="bi bi-box-seam-fill me-1"></i>@Model.Count() Products</span>
+            <button type="button" class="graph-btn" data-graph="products" data-title="Products (last 6 months)">
+                <i class="bi bi-bar-chart-fill"></i> Graph
+            </button>
+        </div>
+
+
+        <div class="d-flex gap-4">
+
+            <a href="@Url.Action("Create", "Category")"
+               class="pr-btn">
+
+                <i class="bi bi-plus-circle me-1"></i>
+                Add New Category
+
+            </a>
+            <a href="@Url.Action("Create", "Brand")"
+               class="pr-btn">
+
+                <i class="bi bi-plus-circle me-1"></i>
+                Add New Brand
+
+            </a>
+            <a href="@Url.Action("Create", "Unit")"
+               class="pr-btn">
+
+                <i class="bi bi-plus-circle me-1"></i>
+                Add New Unit
+
+            </a>
+
+            <!-- ADD PRODUCT -->
+
+
+            <a href="@Url.Action("Create", "Product")"
+               class="pr-btn">
+
+                <i class="bi bi-plus-circle me-1"></i>
+                Add Product
+
+            </a>
+            <a href="@Url.Action("Index", "PromoCode")"
+               class="pr-btn">
+
+                <i class="bi bi-plus-circle me-1"></i>
+                 PromoCode
+
+            </a>
+
+
+
+            <!-- BACK -->
+            <a href="javascript:history.back()"
+               class="pr-btn"
+               style="background:linear-gradient(145deg,#c78997,#2B103C);
+                      color:#f5e4c4;
+                      box-shadow:4px 4px 10px rgba(124,58,237,0.15),
+                                 -4px -4px 10px rgba(255,255,255,0.9);">
+
+                <i class="bi bi-arrow-left me-1"></i>
+                Back
+
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         PRODUCT LIST
+    ========================================== -->
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="pr-glass p-3">
+
+            <div class="pr-list-wrap"
+                 id="prListWrap">
+
+
+                @foreach (var product in Model)
+                {
+                    <div class="pr-row">
+
+
+                        <!-- =========================
+                             PRODUCT IMAGE
+                        ========================== -->
+
+                        @if (!string.IsNullOrEmpty(product.ImagePath))
+                        {
+                            <img src="@Url.Content(product.ImagePath)"
+                                 class="pr-thumb"
+                                 alt="@product.ProductName" />
+                        }
+                        else
+                        {
+                            <div class="pr-thumb-placeholder">
+                                <i class="bi bi-image"></i>
+                            </div>
+                        }
+
+
+                        <!-- =========================
+                             PRODUCT INFORMATION
+                        ========================== -->
+
+                        <div class="flex-grow-1"
+                             style="min-width:0;">
+
+                            <div class="d-flex align-items-center gap-2 flex-wrap">
+
+                                <span class="pr-name">
+                                    @product.ProductName
+                                </span>
+
+
+                                <!-- CATEGORY -->
+                                @if (product.Category != null)
+                                {
+                                    <span class="badge"
+                                          style="background:linear-gradient(90deg,#3B82F6,#7C3AED);
+                                                 font-weight:500;">
+
+                                        @product.Category.Name
+
+                                    </span>
+                                }
+
+
+                                <!-- ACTIVE STATUS -->
+                                @if (product.IsActive)
+                                {
+                                    <span class="badge bg-success">
+                                        Active
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">
+                                        Inactive
+                                    </span>
+                                }
+
+                            </div>
+
+
+                            <!-- DESCRIPTION + STOCK -->
+
+                            <div class="pr-meta text-truncate">
+
+                                @(string.IsNullOrEmpty(product.Description)
+                                    ? "No description"
+                                    : product.Description)
+                                &middot;
+
+                                Stock:
+                                @product.StockQuantity
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- =========================
+                             PRICE
+                        ========================== -->
+
+                        <div class="pr-price">
+
+                            Taka @product.UnitPrice.ToString("N2")
+
+                        </div>
+
+
+                        <!-- =========================
+                             ACTION BUTTONS
+                        ========================== -->
+
+                        <div class="d-flex align-items-center pr-actions">
+
+
+                            <!-- DETAILS -->
+                            
+                            
+                                <a href="@Url.Action(
+                                    "Details",
+                                    "Product",
+                                    new { id = product.ProductId }
+                                )"
+                                   class="pr-icon-btn"
+                                   title="Details">
+
+                                    <i class="bi bi-eye"></i>
+
+                                </a>
+                            
+
+
+                            <!-- EDIT -->
+                            
+                            
+                                <a href="@Url.Action(
+                                    "Edit",
+                                    "Product",
+                                    new { id = product.ProductId }
+                                )"
+                                   class="pr-icon-btn"
+                                   title="Edit">
+
+                                    <i class="bi bi-pencil"></i>
+
+                                </a>
+                            
+
+
+                            <!-- DELETE -->
+                           
+                            
+                                <a href="@Url.Action(
+                                    "Delete",
+                                    "Product",
+                                    new { id = product.ProductId }
+                                )"
+                                   class="pr-icon-btn danger"
+                                   title="Delete">
+
+                                    <i class="bi bi-trash"></i>
+
+                                </a>
+                            
+
+                        </div>
+
+                    </div>
+                }
+
+
+            </div>
+
+        </div>
+    }
+    else
+    {
+        <!-- =========================================
+             NO PRODUCTS
+        ========================================== -->
+
+        <div class="pr-glass p-5 text-center">
+
+            <div class="mb-3"
+                 style="font-size:3rem;color:#7C3AED;">
+
+                <i class="bi bi-box-seam"></i>
+
+            </div>
+
+
+            <h4 style="color:#64748B;">
+                No products found
+            </h4>
+
+
+            @if (ViewBag.CanAddProducts == true)
+            {
+                <p style="color:#64748B;">
+                    Start by adding your first product.
+                </p>
+
+                <a href="@Url.Action("Create", "Product")"
+                   class="pr-btn">
+
+                    <i class="bi bi-plus-circle me-1"></i>
+                    Add Product
+
+                </a>
+            }
+            else
+            {
+                <p style="color:#64748B;">
+                    You do not have permission to add products.
+                </p>
+            }
+
+        </div>
+    }
+
+</div>
+
+@Html.Partial("_GraphModal")

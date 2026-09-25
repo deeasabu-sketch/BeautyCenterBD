@@ -1,0 +1,134 @@
+﻿@model System.Collections.Generic.List<CustomAuthentication.Models.Product>
+
+@foreach (var p in Model)
+{
+    decimal effectivePrice = p.DiscountPercent > 0
+        ? p.UnitPrice - (p.UnitPrice * p.DiscountPercent / 100m)
+        : p.UnitPrice;
+
+    decimal saveAmount = p.DiscountPercent > 0
+        ? p.UnitPrice - effectivePrice
+        : 0;
+
+    <div class="col-6 col-md-4 col-lg-3">
+        <div class="product-card">
+
+            <!-- IMAGE -->
+            <a href="@Url.Action("Details", new { id = p.ProductId })" class="text-decoration-none">
+                <div class="product-image-wrap">
+
+                    @if (p.DiscountPercent > 0)
+                    {
+                        <span class="discount-badge">-@p.DiscountPercent%</span>
+                    }
+
+                    @if (p.StockQuantity <= 0)
+                    {
+                        <span class="stock-badge stock-out">
+                            <i class="bi bi-x-circle me-1"></i>Out of Stock
+                        </span>
+                    }
+                    else if (p.StockQuantity <= 5)
+                    {
+                        <span class="stock-badge stock-low">
+                            <i class="bi bi-exclamation-circle me-1"></i>Only @p.StockQuantity left
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="stock-badge stock-in">
+                            <i class="bi bi-check-circle me-1"></i>In Stock
+                        </span>
+                    }
+
+                    @if (!string.IsNullOrEmpty(p.ImagePath))
+                    {
+                        <img src="@Url.Content(p.ImagePath)" class="product-img" alt="@p.ProductName" />
+                    }
+                    else
+                    {
+                        <div class="product-img-placeholder">
+                            <i class="bi bi-image"></i>
+                        </div>
+                    }
+
+                    <div class="image-overlay">
+                        <span class="details-btn"><i class="bi bi-eye me-1"></i>View Details</span>
+                    </div>
+
+                </div>
+            </a>
+
+            <!-- INFO -->
+            <div class="p-3">
+
+                <div class="product-category mb-1">@(p.Category?.Name ?? "Beauty Product")</div>
+
+                <a href="@Url.Action("Details", new { id = p.ProductId })" class="product-name fw-bold d-block mb-2">
+                    @p.ProductName
+                </a>
+
+                <div class="mb-2">
+                    <span class="price-tag">Taka @effectivePrice.ToString("N2")</span>
+                    @if (p.DiscountPercent > 0)
+                    {
+                        <span class="old-price ms-1">Taka @p.UnitPrice.ToString("N2")</span>
+                    }
+                </div>
+
+                @if (p.DiscountPercent > 0)
+                {
+                    <div class="save-text mb-2">
+                        <i class="bi bi-tag-fill me-1"></i>Save Taka @saveAmount.ToString("N2")
+                    </div>
+                }
+
+                <div class="mb-3">
+                    @if (p.StockQuantity > 0)
+                    {
+                        <small style="color:#198754;">
+                            <i class="bi bi-box-seam me-1"></i>Available stock: <strong>@p.StockQuantity</strong>
+                        </small>
+                    }
+                    else
+                    {
+                        <small style="color:#888;">
+                            <i class="bi bi-box-seam me-1"></i>Currently unavailable
+                        </small>
+                    }
+                </div>
+
+                @if (p.StockQuantity > 0)
+                {
+                    <div class="row g-2">
+                        <div class="col-6">
+                            @using (Html.BeginForm("AddToCart", "Shop", FormMethod.Post, new { @class = "m-0" }))
+                            {
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="productId" value="@p.ProductId" />
+                                <input type="hidden" name="quantity" value="1" />
+                                <button type="submit" class="btn-cart w-100">
+                                    <i class="bi bi-cart-plus me-1"></i>Cart
+                                </button>
+                            }
+                        </div>
+                        <div class="col-6">
+                            <a href="@Url.Action("BuyNow", "Shop", new { productId = p.ProductId, quantity = 1 })"
+                               class="btn-glass w-100 d-block text-center text-decoration-none">
+                                <i class="bi bi-lightning-charge-fill me-1"></i>Buy Now
+                            </a>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-secondary w-100" disabled style="border-radius:11px;opacity:.55;">
+                        <i class="bi bi-slash-circle me-1"></i>Out of Stock
+                    </button>
+                }
+
+            </div>
+
+        </div>
+    </div>
+}

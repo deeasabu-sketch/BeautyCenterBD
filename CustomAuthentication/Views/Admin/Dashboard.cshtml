@@ -1,0 +1,472 @@
+@{
+    ViewBag.Title = "Dashboard";
+
+    bool canManageUsers = ViewBag.CanManageUsers ?? false;
+    bool canViewOrders = ViewBag.CanViewOrders ?? false;
+    bool canViewProducts = ViewBag.CanViewProducts ?? false;
+    bool canViewFinancials = ViewBag.CanViewFinancials ?? false;
+    bool canManagePromoCodes = ViewBag.CanManagePromoCodes ?? false;
+
+    bool hasAnySection = canManageUsers || canViewOrders || canViewProducts || canViewFinancials || canManagePromoCodes;
+}
+
+<div class="container-fluid px-2 py-2 dash-page">
+
+    <!-- ================= HEADER ================= -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1 dash-title-grad">
+                <i class="bi bi-speedometer2 me-2"></i>Dashboard
+            </h2>
+            <p class="text-muted mb-0">Here's what you have access to manage.</p>
+        </div>
+        <div class="mt-3 mt-md-0">
+            <span class="badge px-3 py-2 dash-role-badge">
+                <i class="bi bi-shield-lock-fill me-1"></i>@User.Identity.Name
+            </span>
+        </div>
+    </div>
+
+    @if (!hasAnySection)
+    {
+        <div class="card border-0 dash-card">
+            <div class="card-body p-5 text-center">
+                <i class="bi bi-lock" style="font-size:2.5rem;color:#7C3AED;"></i>
+                <h5 class="fw-bold mt-3 mb-1">No dashboard sections available</h5>
+                <p class="text-muted mb-0">Ask an administrator to grant you access to the sections you need.</p>
+            </div>
+        </div>
+    }
+
+    <!-- ================= USER MANAGEMENT ================= -->
+    @if (canManageUsers)
+    {
+        <div class="dash-section-header">
+            <h5 class="fw-bold mb-0"><i class="bi bi-people-fill me-2" style="color:#0d6efd;"></i>User Management</h5>
+            <button type="button" class="graph-btn" data-graph="users" data-title="Users by designation">
+                <i class="bi bi-bar-chart-fill"></i> Graph
+            </button>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-6 col-xl-3">
+                <div class="card border-0 dash-card h-100">
+                    <div class="card-body p-3">
+                        <div class="dash-stat-icon icon-blue mb-2"><i class="bi bi-people-fill"></i></div>
+                        <p class="stat-label mb-1">Total Users</p>
+                        <h3 class="stat-value mb-0">@(ViewBag.TotalUsers ?? 0)</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-3">
+                <div class="card border-0 dash-card h-100">
+                    <div class="card-body p-3">
+                        <div class="dash-stat-icon icon-green mb-2"><i class="bi bi-person-check-fill"></i></div>
+                        <p class="stat-label mb-1">Active Users</p>
+                        <h3 class="stat-value mb-0">@(ViewBag.ActiveUsers ?? 0)</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-3">
+                <div class="card border-0 dash-card h-100">
+                    <div class="card-body p-3">
+                        <div class="dash-stat-icon icon-red mb-2"><i class="bi bi-shield-fill-check"></i></div>
+                        <p class="stat-label mb-1">Administrators</p>
+                        <h3 class="stat-value mb-0">@(ViewBag.AdminUsers ?? 0)</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-3">
+                <div class="card border-0 dash-card h-100">
+                    <div class="card-body p-3 d-flex flex-column justify-content-between h-100">
+                        <div>
+                            <p class="stat-label mb-1">Quick Actions</p>
+                        </div>
+                        <div class="d-flex flex-column gap-2">
+                            <a href="@Url.Action("Users", "Admin")" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-list-ul me-1"></i>Manage Users
+                            </a>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <a href="@Url.Action("AddUser", "Admin")" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-person-plus-fill me-1"></i>Add User
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- ================= ORDER MANAGEMENT ================= -->
+    @if (canViewOrders)
+    {
+        <div class="dash-section-header">
+            <h5 class="fw-bold mb-0"><i class="bi bi-cart-check-fill me-2" style="color:#198754;"></i>Order Management</h5>
+            <button type="button" class="graph-btn" data-graph="orders" data-title="Orders (last 6 months)">
+                <i class="bi bi-bar-chart-fill"></i> Graph
+            </button>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-6 col-xl-4">
+                <div class="card border-0 dash-card h-100">
+                    <div class="card-body p-3">
+                        <div class="dash-stat-icon icon-green mb-2"><i class="bi bi-cart-check-fill"></i></div>
+                        <p class="stat-label mb-1">Total Orders</p>
+                        <h3 class="stat-value mb-2">@(ViewBag.TotalOrders ?? 0)</h3>
+                        <a href="@Url.Action("Orders", "Admin")" class="btn btn-sm btn-outline-success">
+                            <i class="bi bi-list-ul me-1"></i>View Orders
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-4">
+                <div class="card border-0 dash-card h-100">
+                    <div class="card-body p-3">
+                        <div class="dash-stat-icon icon-orange mb-2"><i class="bi bi-currency-exchange"></i></div>
+                        <p class="stat-label mb-1">Total Sales Amount</p>
+                        <h3 class="stat-value money mb-0">Taka @(((decimal)(ViewBag.TotalOrderAmount ?? 0m)).ToString("N2"))</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 col-xl-4">
+                <div class="card border-0 dash-card h-100">
+                    <div class="card-body p-3 d-flex flex-column justify-content-center h-100">
+                        <p class="stat-label mb-2">Order Actions</p>
+                        <a href="@Url.Action("Orders", "Admin")" class="btn btn-sm btn-success">
+                            <i class="bi bi-cart-check me-1"></i>Manage Orders
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- ================= PRODUCT MANAGEMENT ================= -->
+    @if (canViewProducts)
+    {
+        <div class="dash-section-header">
+            <h5 class="fw-bold mb-0"><i class="bi bi-box-seam-fill me-2" style="color:#6f42c1;"></i>Product Management</h5>
+            <button type="button" class="graph-btn" data-graph="products" data-title="Products (last 6 months)">
+                <i class="bi bi-bar-chart-fill"></i> Graph
+            </button>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-6 col-xl-4">
+                <div class="card border-0 dash-card h-100">
+                    <div class="card-body p-3">
+                        <div class="dash-stat-icon icon-purple mb-2"><i class="bi bi-box-seam-fill"></i></div>
+                        <p class="stat-label mb-1">Total Products</p>
+                        <h3 class="stat-value mb-0">@(ViewBag.TotalProducts ?? 0)</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-4">
+                <div class="card border-0 dash-card h-100">
+                    <div class="card-body p-3">
+                        <div class="dash-stat-icon icon-green mb-2"><i class="bi bi-check-circle-fill"></i></div>
+                        <p class="stat-label mb-1">Active Products</p>
+                        <h3 class="stat-value mb-0">@(ViewBag.ActiveProducts ?? 0)</h3>
+                        <small class="text-muted">@(ViewBag.InactiveProducts ?? 0) inactive</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 col-xl-4">
+                <div class="card border-0 dash-card h-100">
+                    <div class="card-body p-3 d-flex flex-column justify-content-center h-100">
+                        <p class="stat-label mb-2">Product Actions</p>
+                        <div class="d-flex flex-wrap gap-2">
+                            <a href="@Url.Action("Index", "Product")" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-box-seam me-1"></i>Manage Products
+                            </a>
+                            <a href="@Url.Action("Create", "Product")" class="btn btn-sm btn-primary">
+                                <i class="bi bi-plus-lg me-1"></i>Add Product
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- ================= PROMO CODES ================= -->
+    @if (canManagePromoCodes)
+    {
+        <div class="dash-section-header">
+            <h5 class="fw-bold mb-0"><i class="bi bi-tag-fill me-2" style="color:#7C3AED;"></i>Promo Codes</h5>
+            <button type="button" class="graph-btn" data-graph="promoCodes" data-title="Promo Codes Overview">
+                <i class="bi bi-bar-chart-fill"></i> Graph
+            </button>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-12">
+                <div class="card border-0 dash-card">
+                    <div class="card-body p-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+                        <p class="stat-label mb-0">Create and manage discount codes for the shop.</p>
+                        <a href="@Url.Action("Index", "PromoCode")" class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-tags me-1"></i>Manage Promo Codes
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- ================= WAREHOUSE MANAGEMENT ================= -->
+    @if (canViewFinancials)
+    {
+        <div class="dash-section-header">
+            <h5 class="fw-bold mb-0"><i class="bi bi-building me-2" style="color:#0d6efd;"></i>Warehouse Management</h5>
+            <button type="button" class="graph-btn" data-graph="warehouses" data-title="Warehouses Overview">
+                <i class="bi bi-bar-chart-fill"></i> Graph
+            </button>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-6 col-xl-4">
+                <div class="card border-0 dash-card h-100">
+                    <div class="card-body p-3">
+                        <div class="dash-stat-icon icon-blue mb-2"><i class="bi bi-building-fill"></i></div>
+                        <p class="stat-label mb-1">Total Warehouses</p>
+                        <h3 class="stat-value mb-0">@(ViewBag.TotalWarehouses ?? 0)</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-4">
+                <div class="card border-0 dash-card h-100">
+                    <div class="card-body p-3">
+                        <div class="dash-stat-icon icon-green mb-2"><i class="bi bi-check-circle-fill"></i></div>
+                        <p class="stat-label mb-1">Active Warehouses</p>
+                        <h3 class="stat-value mb-0">@(ViewBag.ActiveWarehouses ?? 0)</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 col-xl-4">
+                <div class="card border-0 dash-card h-100">
+                    <div class="card-body p-3 d-flex flex-column justify-content-center h-100">
+                        <p class="stat-label mb-2">Warehouse Actions</p>
+                        <div class="d-flex flex-wrap gap-2">
+                            <a href="@Url.Action("Index", "Warehouse")" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-building me-1"></i>Manage Warehouses
+                            </a>
+                            <a href="@Url.Action("Create", "Warehouse")" class="btn btn-sm btn-primary">
+                                <i class="bi bi-plus-lg me-1"></i>Add Warehouse
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- ================= FINANCIAL OVERVIEW ================= -->
+    @if (canViewFinancials)
+    {
+        decimal totalSalarySpent = ViewBag.TotalSalarySpent ?? 0m;
+        decimal totalProductCostSpent = ViewBag.TotalProductCostSpent ?? 0m;
+        decimal othersSpent = ViewBag.OthersSpent ?? 0m;
+        decimal totalSpent = ViewBag.TotalSpent ?? 0m;
+        decimal netProfit = ViewBag.NetProfit ?? 0m;
+
+        <div class="dash-section-header">
+            <h5 class="fw-bold mb-0"><i class="bi bi-graph-up-arrow me-2" style="color:#198754;"></i>Financial Overview</h5>
+            <button type="button" class="graph-btn" data-graph="financials" data-title="Financial Overview (last 6 months)">
+                <i class="bi bi-bar-chart-fill"></i> Graph
+            </button>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-6 col-xl-3">
+                <div class="card border-0 dash-card h-100">
+                    <div class="card-body p-3">
+                        <div class="dash-stat-icon icon-blue mb-2"><i class="bi bi-cash-stack"></i></div>
+                        <p class="stat-label mb-1">Salary Spent</p>
+                        <h4 class="stat-value money mb-0">Taka @totalSalarySpent.ToString("N2")</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-3">
+                <div class="card border-0 dash-card h-100">
+                    <div class="card-body p-3">
+                        <div class="dash-stat-icon icon-green mb-2"><i class="bi bi-box-seam"></i></div>
+                        <p class="stat-label mb-1">Product Cost</p>
+                        <h4 class="stat-value money mb-0">Taka @totalProductCostSpent.ToString("N2")</h4>
+                        <small class="text-muted">
+                            @(ViewBag.TotalPurchases ?? 0) purchases &middot; @(ViewBag.TotalSuppliers ?? 0) suppliers
+                        </small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-3">
+                <div class="card border-0 dash-card h-100">
+                    <div class="card-body p-3">
+                        <div class="dash-stat-icon icon-gray mb-2"><i class="bi bi-receipt"></i></div>
+                        <p class="stat-label mb-1">Total Spent</p>
+                        <h4 class="stat-value money mb-0">Taka @totalSpent.ToString("N2")</h4>
+                        <small class="text-muted">Salary + product cost + other</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-3">
+                <div class="card border-0 dash-card h-100 @(netProfit >= 0 ? "profit-card" : "loss-card")">
+                    <div class="card-body p-3">
+                        <div class="dash-stat-icon @(netProfit >= 0 ? "icon-profit" : "icon-red") mb-2">
+                            <i class="bi @(netProfit >= 0 ? "bi-graph-up-arrow" : "bi-graph-down-arrow")"></i>
+                        </div>
+                        <p class="stat-label mb-1">Net Profit</p>
+                        <h4 class="stat-value money mb-1">Taka @netProfit.ToString("N2")</h4>
+                        @if (netProfit > 0)
+                        {
+                            <small class="text-success"><i class="bi bi-arrow-up-circle me-1"></i>Profit</small>
+                        }
+                        else if (netProfit < 0)
+                        {
+                            <small class="text-danger"><i class="bi bi-arrow-down-circle me-1"></i>Loss</small>
+                        }
+                        else
+                        {
+                            <small class="text-muted"><i class="bi bi-dash-circle me-1"></i>Break Even</small>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="card border-0 dash-card h-100">
+                    <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <p class="stat-label mb-2">Salary History</p>
+                            <button type="button" class="graph-btn" data-graph="financials" data-title="Salary included in financial overview">
+                                <i class="bi bi-bar-chart-fill"></i> Graph
+                            </button>
+                        </div>
+                        <a href="@Url.Action("Index", "Salary")" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-cash-stack me-1"></i>View Salaries
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 dash-card h-100">
+                    <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <p class="stat-label mb-2">Purchase History</p>
+                            <button type="button" class="graph-btn" data-graph="purchases" data-title="Purchases (last 6 months)">
+                                <i class="bi bi-bar-chart-fill"></i> Graph
+                            </button>
+                        </div>
+                        <a href="@Url.Action("Index", "Purchase")" class="btn btn-sm btn-outline-success">
+                            <i class="bi bi-bag-plus me-1"></i>View Purchases
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 dash-card h-100">
+                    <div class="card-body p-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <p class="stat-label mb-2">Sale History</p>
+                            <button type="button" class="graph-btn" data-graph="sales" data-title="Sales (last 6 months)">
+                                <i class="bi bi-bar-chart-fill"></i> Graph
+                            </button>
+                        </div>
+                        <a href="@Url.Action("Index", "Sale")" class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-receipt-cutoff me-1"></i>View Sales
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+</div>
+
+@Html.Partial("_GraphModal")
+
+<style>
+    .dash-title-grad {
+        background: linear-gradient(90deg,#3B82F6,#7C3AED);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .dash-role-badge {
+        background: rgba(124,58,237,.12);
+        color: #4C1D95;
+    }
+
+    .dash-section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 6px 0 14px;
+    }
+
+    .dash-card {
+        background: rgba(255,255,255,.68) !important;
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border-radius: 18px !important;
+        box-shadow: 0 7px 25px rgba(124,58,237,.10) !important;
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .dash-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 30px rgba(124,58,237,.18) !important;
+    }
+
+    .dash-stat-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 19px;
+    }
+
+    .icon-blue { background: rgba(13,110,253,.12); color: #0d6efd; }
+    .icon-green { background: rgba(25,135,84,.12); color: #198754; }
+    .icon-purple { background: rgba(111,66,193,.12); color: #6f42c1; }
+    .icon-red { background: rgba(220,53,69,.12); color: #dc3545; }
+    .icon-orange { background: rgba(255,127,17,.12); color: #ff7f11; }
+    .icon-gray { background: rgba(108,117,125,.12); color: #6c757d; }
+    .icon-profit { background: rgba(25,135,84,.12); color: #198754; }
+
+    .stat-label {
+        font-size: .8rem;
+        color: #6c757d;
+        font-weight: 600;
+    }
+
+    .stat-value {
+        font-size: 1.55rem;
+        font-weight: 800;
+        line-height: 1.2;
+    }
+
+    .stat-value.money {
+        font-size: 1.3rem;
+    }
+
+    .profit-card {
+        border-left: 4px solid #198754 !important;
+    }
+
+    .loss-card {
+        border-left: 4px solid #dc3545 !important;
+    }
+
+    @@media (max-width: 575px) {
+        .stat-value { font-size: 1.25rem; }
+        .stat-value.money { font-size: 1.1rem; }
+    }
+</style>

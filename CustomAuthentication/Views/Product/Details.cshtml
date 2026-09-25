@@ -1,0 +1,143 @@
+﻿@model CustomAuthentication.Models.Product
+
+@{
+    ViewBag.Title = "Product Details";
+}
+
+<style>
+    .pd-glass {
+        background: rgba(255,255,255,0.55);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border: 1px solid rgba(255,255,255,0.6);
+        border-radius: 20px;
+        box-shadow: 0 8px 32px rgba(124,58,237,0.15);
+    }
+    .pd-title-grad {
+        background: linear-gradient(90deg,#3B82F6,#7C3AED);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .pd-btn {
+        border: none; border-radius: 10px; padding: 10px 18px;
+        background: linear-gradient(90deg,#3B82F6,#7C3AED); color:#fff; font-weight:600;
+        box-shadow: 4px 4px 10px rgba(124,58,237,0.25);
+    }
+    .pd-btn:hover { color:#fff; opacity:.92; }
+    .pd-btn-ghost {
+        border: none; border-radius: 10px; padding: 10px 18px;
+        background: linear-gradient(145deg,#ffffff,#EDE9FE); color:#7C3AED; font-weight:600;
+        box-shadow: 4px 4px 10px rgba(124,58,237,0.15), -4px -4px 10px rgba(255,255,255,0.9);
+    }
+    .pd-btn-danger {
+        border: none; border-radius: 10px; padding: 10px 18px;
+        background: linear-gradient(90deg,#EF4444,#FB923C); color:#fff; font-weight:600;
+        box-shadow: 4px 4px 10px rgba(255,111,111,0.25);
+    }
+    .pd-btn-danger:hover { color:#fff; opacity:.92; }
+    .pd-label { color:#64748B; font-size:.85rem; }
+    .pd-img {
+        width: 100%;
+        max-height: 380px;
+        object-fit: cover;
+        border-radius: 18px;
+        box-shadow: 0 8px 24px rgba(124,58,237,0.2);
+    }
+    .pd-img-placeholder {
+        width: 100%;
+        height: 320px;
+        border-radius: 18px;
+        display: flex; align-items: center; justify-content: center;
+        background: linear-gradient(145deg,#ffffff,#EDE9FE);
+        color: #7C3AED;
+        font-size: 3rem;
+    }
+</style>
+
+<div class="py-2">
+
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+        <div>
+            <h2 class="fw-bold mb-1 pd-title-grad"><i class="bi bi-bag-heart me-2"></i>Product Details</h2>
+            <p class="mb-0" style="color:#64748B;">Full information about this product</p>
+        </div>
+
+        <a href="javascript:history.back()" class="pd-btn-ghost">
+            <i class="bi bi-arrow-left me-1"></i> Back
+        </a>
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-lg-5">
+            @if (!string.IsNullOrEmpty(Model.ImagePath))
+            {
+                <img src="@Url.Content(Model.ImagePath)" class="pd-img" alt="@Model.ProductName" />
+            }
+            else
+            {
+                <div class="pd-img-placeholder"><i class="bi bi-image"></i></div>
+            }
+        </div>
+
+        <div class="col-lg-7">
+            <div class="pd-glass p-4 h-100">
+
+                <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
+                    <h3 class="fw-bold mb-0" style="color:#24324A;">@Model.ProductName</h3>
+                    @if (Model.IsActive)
+                    {
+                        <span class="badge bg-success">Active</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Inactive</span>
+                    }
+                </div>
+
+                @if (Model.Category != null)
+                {
+                    <span class="badge mb-3" style="background:linear-gradient(90deg,#3B82F6,#7C3AED);">@Model.Category.Name</span>
+                }
+
+                <p class="pd-label mb-1">Description</p>
+                <p style="color:#24324A;">
+                    @(string.IsNullOrEmpty(Model.Description) ? "No description available." : Model.Description)
+                </p>
+
+                <hr style="border-color:rgba(124,58,237,0.2);" />
+
+                <div class="row g-3">
+                    <div class="col-6">
+                        <p class="pd-label mb-1">Unit Price</p>
+                        <h4 class="fw-bold" style="color:#7C3AED;">Taka @Model.UnitPrice.ToString("N2")</h4>
+                    </div>
+                    <div class="col-6">
+                        <p class="pd-label mb-1">Stock Quantity</p>
+                        <h4 class="fw-bold" style="color:#24324A;">@Model.StockQuantity</h4>
+                    </div>
+                    <div class="col-6">
+                        <p class="pd-label mb-1">Added On</p>
+                        <p style="color:#24324A;">@Model.CreateDate.ToString("dd MMM yyyy")</p>
+                    </div>
+                </div>
+
+                @if (User.IsInRole("Admin"))
+                {
+                    <div class="d-flex gap-2 mt-4">
+                        <a href="@Url.Action("Edit", "Product", new { id = Model.ProductId })" class="pd-btn">
+                            <i class="bi bi-pencil me-1"></i> Edit
+                        </a>
+                        <a href="@Url.Action("Delete", "Product", new { id = Model.ProductId })" class="pd-btn-danger">
+                            <i class="bi bi-trash me-1"></i> Delete
+                        </a>
+                    </div>
+                }
+
+            </div>
+        </div>
+
+    </div>
+
+</div>

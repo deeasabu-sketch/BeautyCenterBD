@@ -1,0 +1,580 @@
+@model CustomAuthentication.ViewModel.ShopIndexViewModel
+
+@{
+    ViewBag.Title = "Shop";
+}
+
+<link rel="stylesheet" href="@Url.Content("~/Content/shop-index.css")" />
+
+<div class="gsearch-bar">
+
+    <!-- Promo code ticker -->
+    <div class="promo-ticker-wrap" id="promoTickerWrap">
+        <div class="promo-ticker-track" id="promoTickerTrack"></div>
+    </div>
+
+</div>
+
+<div class="container py-4 shop-page">
+
+    <!-- ================= HERO ================= -->
+    <!--<div class="hero-glass text-center">
+        <div class="mb-2">
+            <span class="badge rounded-pill px-3 py-2" style="background:rgba(124,58,237,.12);color:#4C1D95;">
+                <i class="bi bi-stars me-1"></i>Premium Beauty Collection
+            </span>
+        </div>
+        <h1 class="fw-bold title-grad mb-2">BeautyCenter BD</h1>
+        <p class="mb-0" style="color:#64748B;">
+            Wholesale cosmetics &amp; beauty products delivered anywhere in Bangladesh
+        </p>
+    </div>-->
+
+    <!-- ================= CATEGORIES ================= -->
+    <div class="category-wrapper">
+        <div class="mb-2 px-2">
+            <small class="fw-bold" style="color:#475569;">
+                <i class="bi bi-grid me-1"></i>Browse Categories
+            </small>
+        </div>
+
+        <a href="@Url.Action("Index", new { q = Model.SearchTerm })"
+           class="cat-pill @(Model.SelectedCategoryId == null ? "active" : "")">
+            <i class="bi bi-grid-3x3-gap me-1"></i>All Products
+        </a>
+
+        @foreach (var cat in Model.Categories)
+        {
+            <a href="@Url.Action("Index", new { categoryId = cat.CategoryId, q = Model.SearchTerm })"
+               class="cat-pill @(Model.SelectedCategoryId == cat.CategoryId ? "active" : "")">
+                @cat.Name
+            </a>
+        }
+    </div>
+
+    <!-- ================= PRODUCT HEADER ================= -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h5 class="fw-bold mb-1" style="color:#24324A;">
+                <i class="bi bi-bag-heart me-1" style="color:#7C3AED;"></i>Products
+            </h5>
+
+            @if (!string.IsNullOrWhiteSpace(Model.SearchTerm))
+            {
+                <small style="color:#64748B;">
+                    Search results for <strong>"@Model.SearchTerm"</strong>
+                </small>
+            }
+        </div>
+
+        @if (Model.TotalProductCount > 0)
+        {
+            <span class="cart-count">@Model.TotalProductCount Products</span>
+        }
+    </div>
+
+    <!-- ================= LOAD ERROR (initial page load) ================= -->
+    @if (!string.IsNullOrEmpty(Model.LoadError))
+    {
+        <div class="products-error-message is-active">
+            <div>@Model.LoadError</div>
+            <button type="button" class="retry-load-btn" onclick="location.reload();">
+                <i class="bi bi-arrow-clockwise me-1"></i>Retry
+            </button>
+        </div>
+    }
+
+    <!-- ================= PRODUCTS ================= -->
+    @if (string.IsNullOrEmpty(Model.LoadError) && (Model.Products == null || !Model.Products.Any()))
+    {
+        <div class="empty-products">
+            <i class="bi bi-search"></i>
+            <h5 class="mt-3 fw-bold">No products found</h5>
+            <p class="mb-0">Try another search term or select a different category.</p>
+        </div>
+    }
+    else if (Model.Products != null && Model.Products.Any())
+    {
+        <div class="row g-4" id="productGrid">
+            @Html.Partial("_ProductGrid", Model.Products)
+        </div>
+
+        <!-- Infinite scroll: sentinel + status indicators -->
+        <div id="productsLoader" class="products-loader">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+
+        <div id="productsEndMessage" class="products-end-message @(Model.HasMoreProducts ? "" : "is-active")">
+            You've reached the end of the list.
+        </div>
+
+        <div id="productsLoadError" class="products-error-message">
+            <div>Couldn't load more products.</div>
+            <button type="button" id="retryLoadMoreBtn" class="retry-load-btn">
+                <i class="bi bi-arrow-clockwise me-1"></i>Retry
+            </button>
+        </div>
+
+        <div id="productsScrollSentinel" style="height:1px;"></div>
+    }
+
+    <!-- ================= CART ================= -->
+    @* Cart section shows data once ShopIndexViewModel.CartItems is populated
+        from the session cart (see CartHelper / HomeController.Index). *@
+    @if (Model.CartViewModel != null && Model.CartItems != null && Model.CartItems.Any())
+    {
+        <div class="cart-panel">
+            <div class="cart-header">
+                <div>
+                    <h5 class="cart-title">
+                        <i class="bi bi-cart3 me-2" style="color:#7C3AED;"></i>Your Shopping Cart
+                    </h5>
+                    <small style="color:#64748B;">Review your selected products before checkout</small>
+                </div>
+                <span class="cart-count">@Model.CartItems.Sum(x => x.Quantity) Items</span>
+            </div>
+
+            <div class="cart-table-wrap">
+                <table class="table cart-table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Subtotal</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.CartItems)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="cart-product">
+                                        @if (!string.IsNullOrEmpty(item.ImagePath))
+                                        {
+                                            <img src="@Url.Content(item.ImagePath)" class="cart-product-img" alt="@item.ProductName" />
+                                        }
+                                        else
+                                        {
+                                            <div class="cart-product-placeholder">
+                                                <i class="bi bi-image"></i>
+                                            </div>
+                                        }
+                                        <div>
+                                            <a href="@Url.Action("Details", "Shop", new { id = item.ProductId })" class="cart-product-name">
+                                                @item.ProductName
+                                            </a>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><strong style="color:#4C1D95;">Taka @item.UnitPrice.ToString("N2")</strong></td>
+                                <td><span class="qty-badge">@item.Quantity</span></td>
+                                <td><span class="cart-total">Taka @item.LineTotal.ToString("N2")</span></td>
+                                <td class="text-end">
+                                    @using (Html.BeginForm("RemoveFromCart", "Shop", FormMethod.Post, new { @class = "d-inline" }))
+                                    {
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="productId" value="@item.ProductId" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" style="border-radius:9px;" title="Remove">
+                                            <i class="bi bi-trash3"></i>
+                                        </button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="cart-footer">
+                <div>
+                    <small class="d-block" style="color:#64748B;">Cart Total</small>
+                    <div class="cart-grand-total">
+                        Total: <span>Taka @Model.CartTotal.ToString("N2")</span>
+                    </div>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="@Url.Action("Index", "Home")" class="btn btn-light" style="border-radius:12px;">
+                        <i class="bi bi-arrow-left me-1"></i>Continue Shopping
+                    </a>
+                    <a href="@Url.Action("Cart", "Shop")" class="view-cart-btn">
+                        <i class="bi bi-cart-check"></i>View Cart &amp; Checkout
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="cart-panel">
+            <div class="empty-cart">
+                <i class="bi bi-cart3"></i>
+                <h6 class="fw-bold mt-3 mb-1">Your cart is empty</h6>
+                <p class="mb-0">Add products to your cart and they will appear here.</p>
+            </div>
+        </div>
+    }
+
+</div>
+
+
+<!-- ========================= BEAUTYCENTERBD FOOTER ========================= -->
+
+@section Scripts {
+    <script>
+        (function () {
+            loadPromoTicker();
+            initInfiniteScroll();
+        })();
+
+        // ---------------------------------------------------------------
+        // Promo code ticker
+        // ---------------------------------------------------------------
+        function loadPromoTicker() {
+            fetch('@Url.Action("GetActivePromoCodes", "Home")')
+                .then(function (response) {
+                    if (!response.ok) {
+                        throw new Error("Network response was not ok (" + response.status + ")");
+                    }
+                    return response.json();
+                })
+                .then(function (data) {
+                    if (!data || data.length === 0) {
+                        return;
+                    }
+
+                    var track = document.getElementById("promoTickerTrack");
+                    var html = "";
+
+                    // Loop twice so the CSS marquee animation loops seamlessly.
+                    for (var i = 0; i < 2; i++) {
+                        data.forEach(function (promo) {
+                            var code = promo.Code || promo.PromoCode || "";
+                            var desc = promo.Description || "";
+                            html += "<span><i class=\"bi bi-tag-fill me-1\"></i>" +
+                                escapeHtml(code) + " - " + escapeHtml(desc) + "</span>";
+                        });
+                    }
+
+                    track.innerHTML = html;
+                    document.getElementById("promoTickerWrap").style.display = "block";
+                })
+                .catch(function (error) {
+                    // Non-critical: ticker just stays hidden if this fails.
+                    console.error("Promo code fetch error:", error);
+                });
+        }
+
+        function escapeHtml(str) {
+            var div = document.createElement("div");
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // ---------------------------------------------------------------
+        // Infinite scroll product pagination
+        // ---------------------------------------------------------------
+        function initInfiniteScroll() {
+            var sentinel = document.getElementById("productsScrollSentinel");
+            if (!sentinel) {
+                return; // No products / no grid rendered.
+            }
+
+            var grid = document.getElementById("productGrid");
+            var loader = document.getElementById("productsLoader");
+            var endMessage = document.getElementById("productsEndMessage");
+            var errorBox = document.getElementById("productsLoadError");
+            var retryBtn = document.getElementById("retryLoadMoreBtn");
+
+            var state = {
+                page: @(Model.CurrentPage + 1),
+                hasMore: @Model.HasMoreProducts.ToString().ToLower(),
+                loading: false,
+                categoryId: @(Model.SelectedCategoryId.HasValue ? Model.SelectedCategoryId.Value.ToString() : "null"),
+                searchTerm: @Html.Raw(string.IsNullOrEmpty(Model.SearchTerm) ? "null" : System.Web.Helpers.Json.Encode(Model.SearchTerm))
+            };
+
+            var observer = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) {
+                        loadNextPage();
+                    }
+                });
+            }, { rootMargin: "300px" });
+
+            observer.observe(sentinel);
+
+            if (retryBtn) {
+                retryBtn.addEventListener("click", function () {
+                    errorBox.classList.remove("is-active");
+                    loadNextPage();
+                });
+            }
+
+            function loadNextPage() {
+                if (state.loading || !state.hasMore) {
+                    return;
+                }
+
+                state.loading = true;
+                loader.classList.add("is-active");
+                errorBox.classList.remove("is-active");
+
+                var params = new URLSearchParams();
+                params.set("page", state.page);
+                if (state.categoryId !== null) {
+                    params.set("categoryId", state.categoryId);
+                }
+                if (state.searchTerm !== null) {
+                    params.set("q", state.searchTerm);
+                }
+
+                fetch('@Url.Action("LoadMoreProducts", "Home")' + "?" + params.toString())
+                    .then(function (response) {
+                        if (!response.ok) {
+                            throw new Error("Network response was not ok (" + response.status + ")");
+                        }
+                        return response.json();
+                    })
+                    .then(function (data) {
+                        loader.classList.remove("is-active");
+                        state.loading = false;
+
+                        if (!data.success) {
+                            errorBox.classList.add("is-active");
+                            return;
+                        }
+
+                        if (data.html) {
+                            grid.insertAdjacentHTML("beforeend", data.html);
+                        }
+
+                        state.hasMore = !!data.hasMore;
+                        state.page = data.nextPage || (state.page + 1);
+
+                        if (!state.hasMore) {
+                            endMessage.classList.add("is-active");
+                            observer.unobserve(sentinel);
+                        }
+                    })
+                    .catch(function (error) {
+                        console.error("Load more products error:", error);
+                        loader.classList.remove("is-active");
+                        state.loading = false;
+                        errorBox.classList.add("is-active");
+                    });
+            }
+        }
+    </script>
+}
+<style>
+
+
+   .promo-ticker-wrap {
+    display: block !important;
+    width: 100% !important;
+    height: 30px !important;
+
+    /* Luxury Brown / Gold Gradient */
+    background: linear-gradient(
+        90deg,
+        #C4B5FD 25%,
+        #D9F99D 30%
+    ) !important;
+
+    color: #1B5E3A !important;
+
+    border: 1px solid rgba(198, 161, 91, 0.45) !important;
+    border-radius: 15px !important;
+
+    margin: 5px 0 !important;
+    padding: 0 !important;
+
+    overflow: hidden !important;
+    white-space: nowrap !important;
+
+    box-sizing: border-box !important;
+
+    box-shadow:
+        0 8px 25px rgba(47, 36, 31, 0.20),
+        inset 0 1px 0 rgba(255, 255, 255, 0.20) !important;
+}
+
+
+/* =========================================================
+   TICKER TRACK
+   ========================================================= */
+
+.promo-ticker-track {
+    display: flex !important;
+    align-items: center !important;
+
+    width: max-content !important;
+    min-width: 100% !important;
+    height: 70% !important;
+
+    color: #1B5E3A !important;
+
+    font-size: 15px !important;
+    font-weight: 600 !important;
+
+    line-height: 60px !important;
+
+    white-space: nowrap !important;
+
+    animation: promoTickerScroll 22s linear infinite !important;
+
+    will-change: transform !important;
+}
+
+
+/* =========================================================
+   TICKER ITEMS
+   ========================================================= */
+
+.promo-ticker-track span {
+    display: inline-flex !important;
+    align-items: center !important;
+
+    height: 60px !important;
+
+    padding: 0 35px !important;
+
+    color: #1B5E3A !important;
+
+    font-size: 15px !important;
+    font-weight: 600 !important;
+
+    white-space: nowrap !important;
+}
+
+
+/* =========================================================
+   TICKER ICON
+   ========================================================= */
+
+.promo-ticker-track i,
+.promo-ticker-track .promo-icon {
+    margin-right: 8px !important;
+
+    color: #E8C98A !important;
+
+    font-size: 16px !important;
+}
+
+
+/* =========================================================
+   TICKER HOVER
+   ========================================================= */
+
+.promo-ticker-wrap:hover .promo-ticker-track {
+    animation-play-state: paused !important;
+}
+
+
+/* =========================================================
+   TICKER ANIMATION
+   ========================================================= */
+
+@@keyframes promoTickerScroll {
+
+    0% {
+        transform: translateX(100%);
+    }
+
+    100% {
+        transform: translateX(-100%);
+    }
+
+}
+
+
+/* =========================================================
+   TICKER SHINE EFFECT
+   ========================================================= */
+
+.promo-ticker-wrap::after {
+    content: "" !important;
+
+    position: absolute !important;
+
+    top: 0 !important;
+    left: -100% !important;
+
+    width: 50% !important;
+    height: 100% !important;
+
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.12),
+        transparent
+    ) !important;
+
+    pointer-events: none !important;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@@media (max-width: 768px) {
+
+    .promo-ticker-wrap {
+        height: 52px !important;
+
+        margin: 15px 0 !important;
+
+        border-radius: 12px !important;
+    }
+
+    .promo-ticker-track {
+        font-size: 13px !important;
+
+        line-height: 52px !important;
+    }
+
+    .promo-ticker-track span {
+        height: 52px !important;
+
+        padding: 0 25px !important;
+
+        font-size: 13px !important;
+    }
+
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@@media (max-width: 480px) {
+
+    .promo-ticker-wrap {
+        height: 48px !important;
+
+        border-radius: 10px !important;
+    }
+
+    .promo-ticker-track {
+        font-size: 12px !important;
+
+        line-height: 48px !important;
+    }
+
+    .promo-ticker-track span {
+        height: 48px !important;
+
+        padding: 0 20px !important;
+
+        font-size: 12px !important;
+    }
+
+}
+
+</style>

@@ -1,0 +1,102 @@
+﻿@{
+    ViewBag.Title = "Contact";
+}
+
+<style>
+    .ct-glass {
+        background: rgba(255,255,255,0.55);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border: 1px solid rgba(255,255,255,0.6);
+        border-radius: 22px;
+        box-shadow: 0 8px 32px rgba(124,58,237,0.15);
+    }
+    .ct-title-grad {
+        background: linear-gradient(90deg,#3B82F6,#7C3AED);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .ct-icon-circle {
+        width: 52px; height: 52px;
+        border-radius: 14px;
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0;
+        background: linear-gradient(145deg,#ffffff,#EDE9FE);
+        box-shadow: 3px 3px 8px rgba(124,58,237,0.15), -3px -3px 8px rgba(255,255,255,0.9);
+        color: #7C3AED;
+        font-size: 1.3rem;
+    }
+    .ct-row {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 16px 0;
+        border-bottom: 1px solid rgba(124,58,237,0.12);
+    }
+    .ct-row:last-child { border-bottom: none; }
+    .ct-label { color: #64748B; font-size: .8rem; display: block; }
+    .ct-value { color: #24324A; font-weight: 600; text-decoration: none; }
+    .ct-value:hover { color: #7C3AED; }
+</style>
+
+<main aria-labelledby="title" class="py-5">
+
+    <div class="text-center mb-5">
+        <span style="display:inline-block;padding:6px 16px;border-radius:30px;background:linear-gradient(90deg,#3B82F6,#7C3AED);color:#fff;font-weight:600;font-size:.8rem;">
+            <i class="bi bi-envelope"></i> Get In Touch
+        </span>
+
+        <h2 id="title" class="fw-bold mt-3 ct-title-grad">Contact Us</h2>
+        <p class="lead" style="color:#64748B;">We'd love to hear from you</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="ct-glass p-4 p-md-5">
+
+                <div class="ct-row">
+                    <div class="ct-icon-circle"><i class="bi bi-geo-alt"></i></div>
+                    <div>
+                        <span class="ct-label">Address</span>
+                        <span class="ct-value">Dhaka, Bangladesh</span>
+                    </div>
+                </div>
+
+                <div class="ct-row">
+                    <div class="ct-icon-circle"><i class="bi bi-telephone"></i></div>
+                    <div>
+                        <span class="ct-label">Phone</span>
+                        <a href="tel:+8801580932171" class="ct-value">+880 1580932171</a>
+                    </div>
+                </div>
+
+                <div class="ct-row">
+                    <div class="ct-icon-circle"><i class="bi bi-envelope"></i></div>
+                    <div>
+                        <span class="ct-label">Email</span>
+                        <a href="mailto:info@beautycenterbd.com" class="ct-value">info@beautycenterbd.com</a>
+                    </div>
+                </div>
+
+                <div class="ct-row">
+                    <div class="ct-icon-circle"><i class="bi bi-whatsapp"></i></div>
+                    <div>
+                        <span class="ct-label">WhatsApp</span>
+                        <a href="https://wa.me/8801639300922" class="ct-value" target="_blank" rel="noopener">01639300922</a>
+                    </div>
+                </div>
+
+                <div class="ct-row">
+                    <div class="ct-icon-circle"><i class="bi bi-facebook"></i></div>
+                    <div>
+                        <span class="ct-label">Facebook</span>
+                        <a href="https://www.facebook.com/BeautyCenterBDOfficial" class="ct-value" target="_blank" rel="noopener">BeautyCenterBDOfficial</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</main>

@@ -1,0 +1,88 @@
+﻿@model IEnumerable<CustomAuthentication.Models.Unit>
+
+@{
+    ViewBag.Title = "Units";
+}
+
+<style>
+    .glass-card { background: rgba(255,255,255,0.55); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.6); border-radius: 20px; box-shadow: 0 8px 32px rgba(124,58,237,0.15); }
+    .title-grad { background: linear-gradient(90deg,#3B82F6,#7C3AED); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .btn-glass { border: none; border-radius: 10px; padding: 8px 18px; background: linear-gradient(90deg,#3B82F6,#7C3AED); color:#fff; font-weight:600; box-shadow: 4px 4px 10px rgba(124,58,237,0.25); }
+    .btn-glass:hover { color:#fff; opacity:.92; text-decoration:none; }
+    .btn-ghost {
+        border: none;
+        border-radius: 10px;
+        padding: 10px 22px;
+        background: linear-gradient(145deg,#7C3AED,#C4B5FD);
+        color: #182346;
+        font-weight: 600;
+        box-shadow: 4px 4px 10px rgba(124,58,237,0.15), -4px -4px 10px rgba(255,255,255,0.9);
+    }
+
+        .btn-ghost:hover {
+            color: #CAE5BC;
+            text-decoration: none;
+        }
+    .btn-ghost-sm {
+        border: none;
+        border-radius: 8px;
+        padding: 5px 12px;
+        background: linear-gradient(145deg,#7C3AED,#C4B5FD);
+        color: #182346;
+        font-weight: 600;
+        font-size: .85rem;
+    }
+        .btn-ghost-sm:hover {
+            color: #CAE5BC;
+            text-decoration: none;
+        }
+    .btn-danger-sm { border: none; border-radius: 8px; padding: 5px 12px; background: linear-gradient(90deg,#EF4444,#FB923C); color:#fff; font-weight:600; font-size:.85rem; }
+    .btn-danger-sm:hover { color:#fff; }
+</style>
+
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1 title-grad"><i class="bi bi-rulers me-2"></i>Units</h2>
+            <p class="mb-0" style="color:#64748B;">Manage units of measure (pcs, kg, box...)</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="@Url.Action("Index", "Product")" class="btn-ghost"><i class="bi bi-arrow-left me-1"></i>Product</a>
+            <a href="@Url.Action("Dashboard", "Admin")" class="btn-ghost"><i class="bi bi-arrow-left me-1"></i>Dashboard</a>
+            <a href="@Url.Action("Create")" class="btn-glass"><i class="bi bi-plus-lg me-1"></i>Add Unit</a>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null) { <div class="alert alert-success">@TempData["Success"]</div> }
+    @if (TempData["Error"] != null) { <div class="alert alert-danger">@TempData["Error"]</div> }
+
+    <div class="glass-card">
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead><tr><th class="ps-4">Name</th><th>Short Code</th><th>Status</th><th class="text-end pe-4">Actions</th></tr></thead>
+                <tbody>
+                    @if (!Model.Any()) { <tr><td colspan="4" class="text-center py-4" style="color:#64748B;">No units yet.</td></tr> }
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="ps-4 fw-semibold" style="color:#24324A;">@item.Name</td>
+                            <td style="color:#64748B;">@item.ShortCode</td>
+                            <td>
+                                @if (item.IsActive) { <span class="badge bg-success">Active</span> }
+                                else { <span class="badge bg-secondary">Inactive</span> }
+                            </td>
+                            <td class="text-end pe-4">
+                                <a href="@Url.Action("Edit", new { id = item.UnitId })" class="btn-ghost-sm"><i class="bi bi-pencil"></i> Edit</a>
+                                @using (Html.BeginForm("Delete", "Unit", new { id = item.UnitId }, FormMethod.Post, new { style = "display:inline" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn-danger-sm" onclick="return confirm('Delete this unit?');"><i class="bi bi-trash3"></i> Delete</button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,28 @@
+@{
+    ViewBag.Title = "Payment Failed";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="glass-card p-4 p-md-5 text-center">
+                <div class="mb-3" style="font-size:3rem;color:#EF4444;">
+                    <i class="bi bi-x-circle-fill"></i>
+                </div>
+                <h1 class="h3 fw-bold mb-2">Payment was not completed</h1>
+                <p class="text-muted mb-4">The payment could not be completed or was cancelled. Your order has not been marked as paid.</p>
+                <div class="d-flex flex-wrap justify-content-center gap-2">
+                    <a href="@Url.Action("Index", "Home")" class="btn btn-primary">
+                        <i class="bi bi-shop me-1"></i>Continue Shopping
+                    </a>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <a href="@Url.Action("MyOrders", "Shop")" class="btn btn-outline-secondary">
+                            <i class="bi bi-bag-check me-1"></i>My Orders
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

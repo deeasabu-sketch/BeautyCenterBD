@@ -1,0 +1,112 @@
+﻿@model IEnumerable<CustomAuthentication.Models.Brand>
+
+@{
+    ViewBag.Title = "Brands";
+}
+
+<style>
+    .glass-card { background: rgba(255,255,255,0.55); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.6); border-radius: 20px; box-shadow: 0 8px 32px rgba(124,58,237,0.15); }
+    .title-grad { background: linear-gradient(90deg,#3B82F6,#7C3AED); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .btn-glass {
+        border: none;
+        border-radius: 10px;
+        padding: 8px 18px;
+        background: linear-gradient(90deg,#7C3AED,#C4B5FD);
+        color: #182346;
+        font-weight: 600;
+        box-shadow: 4px 4px 10px rgba(124,58,237,0.25);
+    }
+        .btn-glass:hover {
+            color: #CAE5BC;
+            opacity: .92;
+            text-decoration: none;
+        }
+    .btn-ghost {
+        border: none;
+        border-radius: 10px;
+        padding: 10px 22px;
+        background: linear-gradient(145deg,#7C3AED,#C4B5FD);
+        color: #182346;
+        font-weight: 600;
+        box-shadow: 4px 4px 10px rgba(124,58,237,0.15), -4px -4px 10px rgba(255,255,255,0.9);
+    }
+
+        .btn-ghost:hover {
+            color: #CAE5BC;
+            text-decoration: none;
+        }
+    .brand-card { transition: all .2s ease; }
+    .brand-card:hover { transform: translateY(-4px); }
+    .brand-logo { width: 100%; height: 120px; object-fit: contain; background: #fff; border-radius: 14px; padding: 10px; }
+    .brand-logo-placeholder { width: 100%; height: 120px; display:flex; align-items:center; justify-content:center; background: linear-gradient(145deg,#ffffff,#EDE9FE); border-radius: 14px; color:#7C3AED; font-size:2rem; }
+    .btn-ghost-sm {
+        border: none;
+        border-radius: 8px;
+        padding: 5px 12px;
+        background: linear-gradient(145deg,#7C3AED,#C4B5FD);
+        color: #182346;
+        font-weight: 600;
+        font-size: .85rem;
+    }
+        .btn-ghost-sm:hover {
+            color: #CAE5BC;
+            text-decoration: none;
+        }
+    .btn-danger-sm { border: none; border-radius: 8px; padding: 5px 12px; background: linear-gradient(90deg,#EF4444,#FB923C); color:#fff; font-weight:600; font-size:.85rem; }
+    .btn-danger-sm:hover { color:#fff; }
+</style>
+
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold mb-1 title-grad"><i class="bi bi-award me-2"></i>Brands</h2>
+            <p class="mb-0" style="color:#64748B;">Manage brands</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="@Url.Action("Index", "Product")" class="btn-ghost"><i class="bi bi-arrow-left me-1"></i>Product</a>
+            <a href="@Url.Action("Dashboard", "Admin")" class="btn-ghost"><i class="bi bi-arrow-left me-1"></i>Dashboard</a>
+            <a href="@Url.Action("Create")" class="btn-glass"><i class="bi bi-plus-lg me-1"></i>Add Brand</a>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null) { <div class="alert alert-success">@TempData["Success"]</div> }
+    @if (TempData["Error"] != null) { <div class="alert alert-danger">@TempData["Error"]</div> }
+
+    @if (!Model.Any())
+    {
+        <div class="glass-card p-5 text-center" style="color:#64748B;">No brands yet.</div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var item in Model)
+            {
+                <div class="col-md-4 col-lg-3">
+                    <div class="glass-card brand-card p-3">
+                        @if (!string.IsNullOrEmpty(item.ImagePath))
+                        {
+                            <img src="@Url.Content(item.ImagePath)" class="brand-logo mb-2" alt="@item.Name" />
+                        }
+                        else
+                        {
+                            <div class="brand-logo-placeholder mb-2"><i class="bi bi-award"></i></div>
+                        }
+                        <h6 class="fw-bold mb-1" style="color:#24324A;">@item.Name</h6>
+                        <div class="mb-2">
+                            @if (item.IsActive) { <span class="badge bg-success">Active</span> }
+                            else { <span class="badge bg-secondary">Inactive</span> }
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a href="@Url.Action("Edit", new { id = item.BrandId })" class="btn-ghost-sm flex-grow-1 text-center"><i class="bi bi-pencil"></i> Edit</a>
+                            @using (Html.BeginForm("Delete", "Brand", new { id = item.BrandId }, FormMethod.Post))
+                            {
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn-danger-sm" onclick="return confirm('Delete this brand?');"><i class="bi bi-trash3"></i></button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

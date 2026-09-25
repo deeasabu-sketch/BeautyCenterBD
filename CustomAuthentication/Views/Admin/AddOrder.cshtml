@@ -1,0 +1,491 @@
+﻿@model CustomAuthentication.Models.Order
+
+@{
+    ViewBag.Title = "Add Order";
+}
+
+<style>
+    .ao-glass {
+        background: rgba(255,255,255,0.55);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border: 1px solid rgba(255,255,255,0.6);
+        border-radius: 20px;
+        box-shadow: 0 8px 32px rgba(124,58,237,0.15);
+    }
+
+    .ao-title-grad {
+        background: linear-gradient(90deg,#3B82F6,#7C3AED);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .ao-btn-ghost {
+        border: none;
+        border-radius: 10px;
+        padding: 8px 18px;
+        background: linear-gradient(145deg,#ffffff,#EDE9FE);
+        color: #7C3AED;
+        font-weight: 600;
+        box-shadow: 4px 4px 10px rgba(124,58,237,0.15), -4px -4px 10px rgba(255,255,255,0.9);
+    }
+
+        .ao-btn-ghost:hover {
+            color: #7C3AED;
+            text-decoration: none;
+        }
+
+    .ao-btn {
+        border: none;
+        border-radius: 10px;
+        padding: 8px 18px;
+        background: linear-gradient(90deg,#3B82F6,#7C3AED);
+        color: #fff;
+        font-weight: 600;
+        box-shadow: 4px 4px 10px rgba(124,58,237,0.25);
+    }
+
+        .ao-btn:hover {
+            color: #fff;
+            opacity: .92;
+            text-decoration: none;
+        }
+</style>
+
+<div class="container-fluid py-4">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold ao-title-grad">
+                <i class="bi bi-cart-plus me-2"></i>
+                Add Order
+            </h2>
+            <p class="mb-0" style="color:#64748B;">
+                Create a new order
+            </p>
+        </div>
+        @Html.Partial("_BackBar", new List<CustomAuthentication.ViewModel.BackBarLink>
+        {
+            new CustomAuthentication.ViewModel.BackBarLink("Dashboard", "Admin", "Dashboard"),
+            new CustomAuthentication.ViewModel.BackBarLink("Orders", "Admin", "Orders")
+        })
+    </div>
+
+    <!-- VALIDATION -->
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            @Html.ValidationSummary(false, "", new { @class = "mb-0" })
+        </div>
+    }
+
+    <div class="ao-glass">
+        <div class="card-body p-4">
+            @using (Html.BeginForm("AddOrder", "Admin", FormMethod.Post, new { id = "orderForm" }))
+            {
+                @Html.AntiForgeryToken()
+
+            <div class="row g-4">
+
+                <!-- CUSTOMER -->
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Customer</label>
+                    @Html.DropDownListFor(
+                        m => m.UserId,
+                        (SelectList)ViewBag.Users,
+                        "Select Customer",
+                        new { @class = "form-select", id = "UserId" }
+                    )
+                </div>
+
+                <!-- ORDER STATUS -->
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Order Status</label>
+                    @Html.DropDownListFor(
+                        m => m.OrderStatus,
+                        new SelectList(new[] { "Pending", "Processing", "Completed", "Cancelled" }),
+                        "Select Status",
+                        new { @class = "form-select", id = "OrderStatus" }
+                    )
+                </div>
+
+                <!-- ACTIVE -->
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Is Active</label>
+                    <div class="form-check form-switch mt-2">
+                        @Html.CheckBoxFor(
+                            m => m.IsActive,
+                            new { @class = "form-check-input", @checked = "checked" }
+                        )
+                        <label class="form-check-label">Active Order</label>
+                    </div>
+                </div>
+
+                <!-- SHIPPING DETAILS SECTION -->
+                <div class="col-12">
+                    <hr />
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-truck me-2 text-primary"></i> Shipping Details
+                    </h5>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Shipping Name</label>
+                    @Html.TextBoxFor(m => m.ShippingName, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.ShippingName, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Shipping Phone</label>
+                    @Html.TextBoxFor(m => m.ShippingPhone, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.ShippingPhone, "", new { @class = "text-danger" })
+                </div>
+
+                @Html.DropDownListFor(
+m => m.DeliveryArea,
+new SelectList(new[]
+{
+    new { Value = CustomAuthentication.Models.DeliveryAreas.Dhaka, Text = "Inside Of Dhaka (Taka 60)" },
+    new { Value = CustomAuthentication.Models.DeliveryAreas.OutsideDhaka, Text = "Outside Of Dhaka (Taka 120)" }
+}, "Value", "Text"),
+"Select Delivery Area",
+new { @class = "form-select", @id = "ddlDeliveryArea", @onchange = "updateDeliveryCharge()" }
+)
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Delivery Charge</label>
+                    @Html.TextBoxFor(m => m.DeliveryCharge, new
+                    {
+                        @class = "form-control",
+                        @id = "DeliveryCharge",
+                        @readonly = "readonly",
+                        value = "0"
+                    })
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label fw-semibold">Shipping Address</label>
+                    @Html.TextBoxFor(m => m.ShippingAddress, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.ShippingAddress, "", new { @class = "text-danger" })
+                </div>
+
+                <!-- PRODUCT SECTION -->
+                <div class="col-12">
+                    <hr />
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-box-seam me-2 text-primary"></i> Add Products
+                    </h5>
+                </div>
+
+                <!-- PRODUCT SELECT -->
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Product</label>
+                    <select id="productSelect" class="form-select">
+                        <option value="">Select Product</option>
+                        @if (ViewBag.Products != null)
+                        {
+                            foreach (var product in ViewBag.Products)
+                            {
+                                <option value="@product.ProductId"
+                                        data-name="@product.ProductName"
+                                        data-price="@product.UnitPrice"
+                                        data-stock="@product.StockQuantity">
+                                    @product.ProductName - Taka @product.UnitPrice.ToString("N2") (Stock: @product.StockQuantity)
+                                </option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <!-- QUANTITY -->
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Quantity</label>
+                    <input type="number" id="quantityInput" class="form-control" min="1" value="1" />
+                    <small id="stockInfo" class="text-muted"></small>
+                </div>
+
+                <!-- ADD BUTTON -->
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="button" id="addProductBtn" class="btn btn-primary w-100">
+                        <i class="bi bi-plus-circle me-1"></i> Add Product
+                    </button>
+                </div>
+
+                <!-- PRODUCTS TABLE -->
+                <div class="col-12">
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle" id="orderItemsTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Product</th>
+                                    <th style="width:120px;" class="text-center">Quantity</th>
+                                    <th style="width:160px;" class="text-end">Unit Price</th>
+                                    <th style="width:160px;" class="text-end">Total</th>
+                                    <th style="width:80px;" class="text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orderItemsBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- DISCOUNT AND TAX -->
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Discount</label>
+                    <input type="number" id="Discount" name="Discount" class="form-control" value="0" min="0" step="0.01" oninput="calculateGrandTotal()" />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Tax</label>
+                    <input type="number" id="Tax" name="Tax" class="form-control" value="0" min="0" step="0.01" oninput="calculateGrandTotal()" />
+                </div>
+
+                <!-- GRAND TOTAL -->
+                <div class="col-12 text-end mt-4">
+                    <div class="mb-2">
+                        <strong>Subtotal:</strong> Taka <span id="subtotal">0.00</span>
+                    </div>
+                    <div class="mb-2">
+                        <strong>Delivery Charge:</strong> Taka <span id="deliveryDisplay">0.00</span>
+                    </div>
+                    <div class="mb-2">
+                        <strong>Discount:</strong> Taka <span id="discountDisplay">0.00</span>
+                    </div>
+                    <div class="mb-2">
+                        <strong>Tax:</strong> Taka <span id="taxDisplay">0.00</span>
+                    </div>
+                    <hr />
+                    <h4>
+                        <strong>Grand Total:</strong> Taka <span id="grandTotal">0.00</span>
+                    </h4>
+                </div>
+
+                <!-- HIDDEN TOTAL AMOUNT FOR SUBMISSION -->
+                @Html.HiddenFor(m => m.TotalAmount, new { id = "TotalAmount" })
+
+                <!-- FORM BUTTONS -->
+                <div class="col-12">
+                    <hr />
+                    <button type="submit" class="ao-btn" id="createOrderBtn">
+                        <i class="bi bi-check-circle me-1"></i> Create Order
+                    </button>
+                    <a href="@Url.Action("Orders", "Admin")" class="ao-btn-ghost">
+                        Cancel
+                    </a>
+                </div>
+
+            </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+    // ============================================
+    // GLOBAL DATA
+    // ============================================
+    var orderItems = [];
+
+    // ============================================
+    // PRODUCT SELECT CHANGE EVENT
+    // ============================================
+    document.getElementById("productSelect").addEventListener("change", function () {
+        var option = this.options[this.selectedIndex];
+
+        if (!option.value) {
+            document.getElementById("stockInfo").innerText = "";
+            return;
+        }
+
+        var stock = parseInt(option.getAttribute("data-stock"));
+        document.getElementById("stockInfo").innerText = "Available stock: " + stock;
+        document.getElementById("quantityInput").value = 1;
+    });
+
+    // ============================================
+    // ADD PRODUCT BUTTON EVENT
+    // ============================================
+    document.getElementById("addProductBtn").addEventListener("click", function () {
+        var select = document.getElementById("productSelect");
+        var quantityInput = document.getElementById("quantityInput");
+
+        if (!select.value) {
+            alert("Please select a product.");
+            return;
+        }
+
+        var option = select.options[select.selectedIndex];
+        var productId = parseInt(select.value);
+        var productName = option.getAttribute("data-name");
+        var unitPrice = parseFloat(option.getAttribute("data-price"));
+        var stock = parseInt(option.getAttribute("data-stock"));
+        var quantity = parseInt(quantityInput.value);
+
+        if (!quantity || quantity <= 0) {
+            alert("Quantity must be greater than 0.");
+            return;
+        }
+
+        if (quantity > stock) {
+            alert("Only " + stock + " item(s) available in stock.");
+            return;
+        }
+
+        var existing = orderItems.find(x => x.productId === productId);
+
+        if (existing) {
+            var newQuantity = existing.quantity + quantity;
+            if (newQuantity > stock) {
+                alert("You cannot add more than " + stock + " item(s) of " + productName + ".");
+                return;
+            }
+            existing.quantity = newQuantity;
+        } else {
+            orderItems.push({
+                productId: productId,
+                productName: productName,
+                quantity: quantity,
+                unitPrice: unitPrice,
+                stock: stock
+            });
+        }
+
+        renderOrderItems();
+
+        // Reset inputs
+        select.value = "";
+        quantityInput.value = 1;
+        document.getElementById("stockInfo").innerText = "";
+    });
+
+    // ============================================
+    // RENDER ORDER ITEMS IN TABLE
+    // ============================================
+    function renderOrderItems() {
+        var tbody = document.getElementById("orderItemsBody");
+        tbody.innerHTML = "";
+
+        orderItems.forEach(function (item, index) {
+            var total = item.quantity * item.unitPrice;
+            var row = document.createElement("tr");
+
+            row.innerHTML =
+                "<td>" +
+                    item.productName +
+                    "<input type='hidden' name='ProductIds' value='" + item.productId + "' />" +
+                "</td>" +
+                "<td class='text-center'>" +
+                    item.quantity +
+                    "<input type='hidden' name='Quantities' value='" + item.quantity + "' />" +
+                "</td>" +
+                "<td class='text-end'>Taka " +
+                    item.unitPrice.toLocaleString("en-BD", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) +
+                "</td>" +
+                "<td class='text-end fw-semibold'>Taka " +
+                    total.toLocaleString("en-BD", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) +
+                "</td>" +
+                "<td class='text-center'>" +
+                    "<button type='button' class='btn btn-sm btn-outline-danger' onclick='removeProduct(" + index + ")'>" +
+                        "<i class='bi bi-trash'></i>" +
+                    "</button>" +
+                "</td>";
+
+            tbody.appendChild(row);
+        });
+
+        // Calculate Totals after rendering
+        calculateGrandTotal();
+    }
+
+    // ============================================
+    // REMOVE PRODUCT
+    // ============================================
+    function removeProduct(index) {
+        orderItems.splice(index, 1);
+        renderOrderItems();
+    }
+
+    // ============================================
+    // DELIVERY CHARGE UPDATE
+    // ============================================
+   function updateDeliveryCharge() {
+    var ddl = document.getElementById("ddlDeliveryArea");
+    var chargeInput = document.getElementById("DeliveryCharge");
+
+    if (!ddl || !chargeInput) return;
+
+    var selectedValue = ddl.value;
+
+    // C# constants
+    var dhakaVal = "@CustomAuthentication.Models.DeliveryAreas.Dhaka";
+    var outsideDhakaVal = "@CustomAuthentication.Models.DeliveryAreas.OutsideDhaka";
+
+    if (selectedValue === dhakaVal) {
+        chargeInput.value = "@CustomAuthentication.Models.DeliveryAreas.DhakaCharge"; // 60
+    } else if (selectedValue === outsideDhakaVal) {
+        chargeInput.value = "@CustomAuthentication.Models.DeliveryAreas.OutsideDhakaCharge"; // 120
+    } else {
+        chargeInput.value = 0;
+    }
+
+    calculateGrandTotal();
+}
+
+    // ============================================
+    // CALCULATE GRAND TOTAL
+    // ============================================
+    function calculateGrandTotal() {
+        var subtotal = orderItems.reduce(function (sum, item) {
+            return sum + (item.quantity * item.unitPrice);
+        }, 0);
+
+        var discount = parseFloat(document.getElementById("Discount").value) || 0;
+        var tax = parseFloat(document.getElementById("Tax").value) || 0;
+        var deliveryCharge = parseFloat(document.getElementById("DeliveryCharge").value) || 0;
+
+        var grandTotal = (subtotal - discount) + tax + deliveryCharge;
+        if (grandTotal < 0) grandTotal = 0;
+
+        // UI Displays
+        document.getElementById("subtotal").innerText = subtotal.toFixed(2);
+        document.getElementById("deliveryDisplay").innerText = deliveryCharge.toFixed(2);
+        document.getElementById("discountDisplay").innerText = discount.toFixed(2);
+        document.getElementById("taxDisplay").innerText = tax.toFixed(2);
+        document.getElementById("grandTotal").innerText = grandTotal.toFixed(2);
+
+        // Form Submit Hidden Field
+        document.getElementById("TotalAmount").value = grandTotal.toFixed(2);
+    }
+
+    // ============================================
+    // FORM VALIDATION
+    // ============================================
+    document.getElementById("orderForm").addEventListener("submit", function (e) {
+        if (orderItems.length === 0) {
+            e.preventDefault();
+            alert("Please add at least one product.");
+            return false;
+        }
+
+        var customer = document.getElementById("UserId").value;
+        if (!customer) {
+            e.preventDefault();
+            alert("Please select a customer.");
+            return false;
+        }
+
+        var status = document.getElementById("OrderStatus").value;
+        if (!status) {
+            e.preventDefault();
+            alert("Please select order status.");
+            return false;
+        }
+        // Page Load হওয়ার পর স্বয়ংক্রিয়ভাবে Delivery Charge এবং Total Calculate করা
+        document.addEventListener("DOMContentLoaded", function () {
+            updateDeliveryCharge();
+        });
+    });
+</script>

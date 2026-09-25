@@ -1,0 +1,110 @@
+﻿/* ==========================================================================
+   BeautyCenter BD - shared application theme
+   Palette: Ocean Breeze + Royal Purple + Sunset/Nature accents
+   ========================================================================== */
+:root {
+    --bc-primary: #0D47A1;
+    --bc-primary-soft: #3B82F6;
+    --bc-cyan: #22D3EE;
+    --bc-purple: #7C3AED;
+    --bc-purple-dark: #4C1D95;
+    --bc-success: #1B5E3A;
+    --bc-green: #4CAF50;
+    --bc-lime: #D9F99D;
+    --bc-orange: #FB923C;
+    --bc-yellow: #FBBF24;
+    --bc-danger: #EF4444;
+    --bc-text: #24324A;
+    --bc-muted: #64748B;
+    --bc-surface: rgba(255,255,255,.82);
+    --bc-border: rgba(13,71,161,.10);
+    --bc-shadow: 0 12px 35px rgba(13,71,161,.08);
+
+    /* Bootstrap component alignment */
+    --bs-primary: #0D47A1;
+    --bs-primary-rgb: 13,71,161;
+    --bs-link-color: #0D47A1;
+    --bs-link-hover-color: #4C1D95;
+    --bs-pink: #7C3AED;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+    color: var(--bc-text);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+.body-content {
+    margin-top: 15px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.dl-horizontal dt { white-space: normal; }
+
+input, select, textarea { max-width: 100%; }
+
+.form-control, .form-select {
+    border-color: #CBD5E1;
+    border-radius: 10px;
+    color: var(--bc-text);
+    background-color: rgba(255,255,255,.96);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--bc-primary-soft);
+    box-shadow: 0 0 0 .2rem rgba(59,130,246,.13);
+}
+
+.table { --bs-table-color: var(--bc-text); }
+.table thead th {
+    color: #334155;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.btn { border-radius: 10px; font-weight: 600; }
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--bc-primary), var(--bc-primary-soft));
+    border-color: transparent;
+}
+
+.btn-primary:hover, .btn-primary:focus {
+    background: linear-gradient(135deg, #083778, var(--bc-primary));
+    border-color: transparent;
+}
+
+.card, .glass-card {
+    border: 1px solid var(--bc-border);
+    border-radius: 18px;
+    box-shadow: var(--bc-shadow);
+}
+
+.text-muted { color: var(--bc-muted) !important; }
+
+/* Shared status / feedback surfaces */
+.bc-alert {
+    border: 1px solid rgba(59,130,246,.14);
+    border-radius: 12px;
+    background: rgba(240,249,255,.88);
+    color: #334155;
+}
+
+.bc-error {
+    border-color: rgba(239,68,68,.20);
+    background: rgba(254,242,242,.94);
+    color: #991B1B;
+}
+
+.bc-success {
+    border-color: rgba(76,175,80,.20);
+    background: rgba(241,248,233,.94);
+    color: #166534;
+}
+
+@media (max-width: 767.98px) {
+    .body-content { padding-left: 10px; padding-right: 10px; }
+}

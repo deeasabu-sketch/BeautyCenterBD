@@ -1,0 +1,1149 @@
+﻿
+@model CustomAuthentication.Models.User
+
+@{
+    ViewBag.Title = "Messenger";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .messenger-page {
+        padding: 20px;
+    }
+
+    .messenger-box {
+        display: flex;
+        height: 650px;
+        background: #fff;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 8px 30px rgba(0,0,0,.08);
+        border: 1px solid #eee;
+    }
+
+    /* LEFT SIDE */
+    .messenger-sidebar {
+        width: 320px;
+        border-right: 1px solid #eee;
+        display: flex;
+        flex-direction: column;
+        background: #fafafa;
+    }
+
+    .messenger-title {
+        padding: 20px;
+        border-bottom: 1px solid #eee;
+    }
+
+        .messenger-title h3 {
+            margin: 0;
+            font-weight: 700;
+            color: #222;
+        }
+
+    .search-box {
+        padding: 15px;
+        border-bottom: 1px solid #eee;
+    }
+
+        .search-box input {
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 11px 14px;
+            outline: none;
+        }
+
+            .search-box input:focus {
+                border-color: #6c63ff;
+                box-shadow: 0 0 0 3px rgba(108,99,255,.08);
+            }
+
+    .user-list {
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    .user-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 13px 16px;
+        cursor: pointer;
+        border-bottom: 1px solid #f0f0f0;
+        transition: .2s;
+    }
+
+        .user-item:hover {
+            background: #f0efff;
+        }
+
+        .user-item.active {
+            background: #e9e7ff;
+        }
+
+    .user-avatar {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        object-fit: cover;
+        background: #ddd;
+        flex-shrink: 0;
+    }
+
+    .user-info {
+        min-width: 0;
+    }
+
+    .user-name {
+        font-weight: 600;
+        color: #222;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .user-email {
+        font-size: 12px;
+        color: #888;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* RIGHT SIDE */
+    .conversation-area {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+    }
+
+    .conversation-header {
+        height: 75px;
+        padding: 12px 20px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .conversation-header-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .conversation-header-name {
+        font-weight: 700;
+        font-size: 16px;
+    }
+
+    .conversation-header-status {
+        font-size: 12px;
+        color: #888;
+    }
+
+    .messages-area {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        background: #f7f8fc;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .empty-conversation {
+        margin: auto;
+        text-align: center;
+        color: #999;
+    }
+
+        .empty-conversation i {
+            font-size: 50px;
+            margin-bottom: 10px;
+        }
+
+    .message-row {
+        display: flex;
+        width: 100%;
+    }
+
+        .message-row.sent {
+            justify-content: flex-end;
+        }
+
+        .message-row.received {
+            justify-content: flex-start;
+        }
+
+    .message-bubble {
+        max-width: 65%;
+        padding: 10px 14px;
+        border-radius: 15px;
+        word-break: break-word;
+        font-size: 14px;
+        line-height: 1.45;
+    }
+
+    .message-row.sent .message-bubble {
+        background: #6c63ff;
+        color: #fff;
+        border-bottom-right-radius: 4px;
+    }
+
+    .message-row.received .message-bubble {
+        background: #fff;
+        color: #333;
+        border: 1px solid #eee;
+        border-bottom-left-radius: 4px;
+    }
+
+    .message-time {
+        display: block;
+        font-size: 10px;
+        margin-top: 4px;
+        opacity: .65;
+        text-align: right;
+    }
+
+    /* SEND AREA */
+    .message-input-area {
+        padding: 15px;
+        border-top: 1px solid #eee;
+        background: #fff;
+        display: flex;
+        gap: 10px;
+    }
+
+    .message-input {
+        flex: 1;
+        border: 1px solid #ddd;
+        border-radius: 12px;
+        padding: 12px 15px;
+        outline: none;
+        resize: none;
+        height: 46px;
+    }
+
+        .message-input:focus {
+            border-color: #6c63ff;
+        }
+
+    .send-btn {
+        width: 50px;
+        border: none;
+        border-radius: 12px;
+        background: #6c63ff;
+        color: white;
+        cursor: pointer;
+        transition: .2s;
+    }
+
+        .send-btn:hover {
+            background: #574fe0;
+        }
+
+        .send-btn:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+        }
+
+    .no-users {
+        padding: 30px 15px;
+        text-align: center;
+        color: #999;
+    }
+
+    /* RESPONSIVE */
+    @@media (max-width: 768px) {
+
+        .messenger-page {
+            padding: 10px;
+        }
+
+        .messenger-box {
+            height: calc(100vh - 120px);
+        }
+
+        .messenger-sidebar {
+            width: 90px;
+        }
+
+        .messenger-title h3 {
+            font-size: 15px;
+        }
+
+        .search-box {
+            padding: 8px;
+        }
+
+            .search-box input {
+                font-size: 11px;
+                padding: 8px;
+            }
+
+        .user-item {
+            justify-content: center;
+            padding: 10px 5px;
+        }
+
+        .user-info {
+            display: none;
+        }
+
+        .user-avatar {
+            width: 42px;
+            height: 42px;
+        }
+
+        .message-bubble {
+            max-width: 80%;
+        }
+        .avatar-initial {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #6c63ff, #8b5cf6);
+            color: #fff;
+            font-weight: 700;
+            font-size: 17px;
+        }
+    }
+</style>
+
+<div class="messenger-page">
+
+    <div class="messenger-box">
+
+        <!-- ================================= -->
+        <!-- LEFT SIDEBAR -->
+        <!-- ================================= -->
+        <div class="messenger-sidebar">
+
+            <div class="messenger-title">
+                <h3>
+                    <i class="fas fa-comments"></i>
+                    Messenger
+                </h3>
+            </div>
+
+            <div class="search-box">
+                <input type="text"
+                       id="userSearch"
+                       placeholder="Search user..." />
+            </div>
+
+            <div id="userList" class="user-list">
+                <div class="no-users">
+                    Loading users...
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- ================================= -->
+        <!-- CONVERSATION -->
+        <!-- ================================= -->
+        <div class="conversation-area">
+
+            <!-- HEADER -->
+            <div id="conversationHeader"
+                 class="conversation-header">
+
+                <div class="empty-conversation">
+                    <span>Select a user</span>
+                </div>
+
+            </div>
+
+
+            <!-- MESSAGES -->
+            <div id="messagesArea"
+                 class="messages-area">
+
+                <div class="empty-conversation">
+
+                    <i class="fas fa-comments"></i>
+
+                    <div>
+                        Select a user to start conversation
+                    </div>
+
+                </div>
+
+            </div>
+
+
+           <!-- SEND MESSAGE -->
+             <div class="message-input-area">
+
+    @Html.AntiForgeryToken()
+
+    <textarea id="messageInput"
+              class="message-input"
+              placeholder="Type your message..."
+              disabled></textarea>
+
+    <button type="button"
+            id="sendMessageBtn"
+            class="send-btn"
+            disabled
+            title="Send Message">
+        <i class="fas fa-paper-plane"></i>
+    </button>
+
+</div>
+
+             <script>
+    (function () {
+
+
+        let selectedUserId = null;
+        let currentUserId = @(Model.UserId);
+        let conversationTimer = null;
+        let searchTimer = null;
+        let isLoadingConversation = false;
+
+        const urls = {
+            users: '@Url.Action("Users", "Message")',
+            search: '@Url.Action("SearchUsers", "Message")',
+            conversation: '@Url.Action("Conversation", "Message")',
+            send: '@Url.Action("Send", "Message")'
+        };
+
+
+        // ==========================================
+        // INITIAL LOAD
+        // ==========================================
+
+        $(document).ready(function () {
+
+            loadUsers();
+
+            $("#userSearch").on("input", function () {
+
+                const term = $(this).val().trim();
+
+                clearTimeout(searchTimer);
+
+                searchTimer = setTimeout(function () {
+
+                    if (term.length === 0) {
+                        loadUsers();
+                    }
+                    else {
+                        searchUsers(term);
+                    }
+
+                }, 250);
+
+            });
+
+
+            $("#sendMessageBtn").on("click", function () {
+                sendMessage();
+            });
+
+
+            $("#messageInput").on("keydown", function (e) {
+
+                // Enter = Send
+                // Shift + Enter = New Line
+                if (e.key === "Enter" && !e.shiftKey) {
+
+                    e.preventDefault();
+
+                    sendMessage();
+                }
+
+                $("#userSearch").on("input", function () {
+
+                    const term = $(this).val().trim();
+
+                    clearTimeout(searchTimer);
+
+                    searchTimer = setTimeout(function () {
+
+                        if (term.length === 0) {
+
+                            loadUsers();
+
+                        } else {
+
+                            searchUsers(term);
+
+                        }
+
+                    }, 300);
+
+                });
+            });
+
+
+            // Refresh conversation every 3 seconds
+            conversationTimer = setInterval(function () {
+
+                if (selectedUserId !== null && !isLoadingConversation) {
+                    loadConversation(selectedUserId, false);
+                }
+
+            }, 3000);
+
+        });
+
+
+        function loadUsers() {
+
+            console.log("Loading users...");
+
+            $("#userList").html(`
+        <div class="no-users">
+            <i class="fas fa-spinner fa-spin"></i>
+            <div>Loading users...</div>
+        </div>
+    `);
+
+            $.ajax({
+                url: urls.users,
+                type: "GET",
+                cache: false,
+
+                success: function (response) {
+
+                    console.log("Users response:", response);
+
+                    if (!response || !response.success) {
+                        showNoUsers("Unable to load users.");
+                        return;
+                    }
+
+                    renderUsers(response.users || []);
+                },
+
+                error: function (xhr, status, error) {
+
+                    console.log("Users error:", xhr);
+                    console.log("Status:", status);
+                    console.log("Error:", error);
+
+                    showNoUsers("Unable to load users.");
+                }
+            });
+        }
+
+
+        function searchUsers(term) {
+
+            console.log("Searching:", term);
+
+            $.ajax({
+
+                url: urls.search,
+                type: "GET",
+
+                data: {
+                    term: term
+                },
+
+                cache: false,
+
+                success: function (response) {
+
+                    console.log("Search response:", response);
+
+                    if (!response || !response.success) {
+
+                        showNoUsers("Unable to search users.");
+                        return;
+                    }
+
+                    renderUsers(response.users || []);
+                },
+
+                error: function (xhr, status, error) {
+
+                    console.log("Search error:", xhr);
+                    console.log("Status:", status);
+                    console.log("Error:", error);
+
+                    showNoUsers("Search failed.");
+                }
+            });
+        }
+
+        function renderUsers(users) {
+
+            const $list = $("#userList");
+
+            $list.empty();
+
+            if (!users || users.length === 0) {
+
+                showNoUsers("No users found.");
+                return;
+            }
+
+            $.each(users, function (index, user) {
+
+                const avatar = getAvatar(user);
+
+                const activeClass =
+                    selectedUserId === user.id
+                        ? "active"
+                        : "";
+
+                const html = `
+            <div class="user-item ${activeClass}"
+                 data-user-id="${user.id}">
+
+                ${avatar}
+
+                <div class="user-info">
+
+                    <div class="user-name">
+                        ${escapeHtml(user.name || "Unknown User")}
+                    </div>
+
+                    <div class="user-email">
+                        ${escapeHtml(user.email || "")}
+                    </div>
+
+                </div>
+
+            </div>
+        `;
+
+                $list.append(html);
+            });
+
+
+            // ==========================================
+            // USER CLICK
+            // ==========================================
+
+            $list.find(".user-item").off("click").on("click", function () {
+
+                const userId =
+                    parseInt($(this).attr("data-user-id"));
+
+                console.log("Selected user:", userId);
+
+                if (!userId) {
+                    return;
+                }
+
+                selectedUserId = userId;
+
+                $list.find(".user-item").removeClass("active");
+
+                $(this).addClass("active");
+
+                loadConversation(userId, true);
+            });
+        }
+
+
+        // ==========================================
+        // LOAD CONVERSATION
+        // ==========================================
+
+        function loadConversation(userId, scrollToBottom) {
+
+            if (!userId) {
+                return;
+            }
+
+            isLoadingConversation = true;
+
+            $.ajax({
+
+                url: urls.conversation,
+                type: "GET",
+                data: {
+                    userId: userId
+                },
+                cache: false,
+
+                success: function (response) {
+
+                    if (!response || !response.success) {
+
+                        showConversationError("Unable to load conversation.");
+
+                        return;
+                    }
+
+
+                    // Make sure selected user is still the same
+                    if (selectedUserId !== userId) {
+                        return;
+                    }
+
+
+                    renderConversationHeader(response.user);
+
+                    renderMessages(
+                        response.messages,
+                        response.currentUserId,
+                        scrollToBottom
+                    );
+
+
+                    $("#messageInput")
+                        .prop("disabled", false)
+                        .attr(
+                            "placeholder",
+                            "Message " +
+                            (response.user.name || "") +
+                            "..."
+                        );
+
+
+                    $("#sendMessageBtn")
+                        .prop("disabled", false);
+
+
+                    // Update navbar unread count
+                    if (typeof updateMessageUnreadCount === "function") {
+                        updateMessageUnreadCount();
+                    }
+
+                },
+
+                error: function () {
+
+                    showConversationError(
+                        "Something went wrong while loading conversation."
+                    );
+
+                },
+
+                complete: function () {
+
+                    isLoadingConversation = false;
+                }
+
+            });
+
+        }
+
+
+        // ==========================================
+        // CONVERSATION HEADER
+        // ==========================================
+
+        function renderConversationHeader(user) {
+
+            const avatar = getAvatar(user);
+
+            const html = `
+
+                ${avatar}
+
+                <div class="conversation-header-info">
+
+                    <div class="conversation-header-name">
+                        ${escapeHtml(user.name || "Unknown User")}
+                    </div>
+
+                    <div class="conversation-header-status">
+                        ${escapeHtml(user.role || user.email || "")}
+                    </div>
+
+                </div>
+            `;
+
+
+            $("#conversationHeader").html(html);
+        }
+
+
+        // ==========================================
+        // RENDER MESSAGES
+        // ==========================================
+
+        function renderMessages(messages, myUserId, scrollToBottom) {
+
+            const $area = $("#messagesArea");
+
+            if (!messages || messages.length === 0) {
+
+                $area.html(`
+
+                    <div class="empty-conversation">
+
+                        <i class="fas fa-comments"></i>
+
+                        <div>
+                            No messages yet.
+                        </div>
+
+                        <small>
+                            Start the conversation.
+                        </small>
+
+                    </div>
+
+                `);
+
+                return;
+            }
+
+
+            let html = "";
+
+
+            messages.forEach(function (message) {
+
+                const isSent =
+                    parseInt(message.senderId) === parseInt(myUserId);
+
+                const rowClass =
+                    isSent
+                        ? "sent"
+                        : "received";
+
+
+                html += `
+
+                    <div class="message-row ${rowClass}">
+
+                        <div class="message-bubble">
+
+                            <div class="message-text">
+                                ${escapeHtml(message.message)}
+                            </div>
+
+                            <span class="message-time">
+                                ${formatMessageDate(message.createdDate)}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                `;
+
+            });
+
+
+            const wasNearBottom = isNearBottom($area[0]);
+
+            $area.html(html);
+
+
+            if (scrollToBottom || wasNearBottom) {
+                scrollMessagesToBottom();
+            }
+
+        }
+
+
+        // ==========================================
+        // SEND MESSAGE
+        // ==========================================
+
+        function sendMessage() {
+
+            if (!selectedUserId) {
+                return;
+            }
+
+
+            const $input = $("#messageInput");
+            const $button = $("#sendMessageBtn");
+
+            const messageText = $input.val().trim();
+
+
+            if (!messageText) {
+                return;
+            }
+
+
+            if (messageText.length > 2000) {
+
+                alert("Message cannot exceed 2000 characters.");
+                return;
+            }
+
+
+            const token =
+                $('input[name="__RequestVerificationToken"]').val();
+
+
+            if (!token) {
+
+                alert("Security token not found. Please refresh the page.");
+                return;
+            }
+
+
+            $button.prop("disabled", true);
+
+
+            $.ajax({
+
+                url: urls.send,
+                type: "POST",
+
+                data: {
+
+                    receiverId: selectedUserId,
+                    messageText: messageText,
+                    __RequestVerificationToken: token
+
+                },
+
+
+                success: function (response) {
+
+                    if (!response || !response.success) {
+
+                        alert(
+                            response && response.message
+                                ? response.message
+                                : "Message could not be sent."
+                        );
+
+                        return;
+                    }
+
+
+                    $input.val("");
+
+                    loadConversation(selectedUserId, true);
+
+                },
+
+
+                error: function (xhr) {
+
+                    console.log("Send message error:", xhr);
+
+                    alert("Unable to send message.");
+
+                },
+
+
+                complete: function () {
+
+                    $button.prop("disabled", false);
+
+                    $input.focus();
+
+                }
+
+            });
+
+        }
+
+
+        function getAvatar(user) {
+
+            const image = normalizeImagePath(user.image);
+
+            if (image) {
+
+                return `
+            <img src="${escapeAttribute(image)}"
+                 class="user-avatar"
+                 alt="${escapeAttribute(user.name || "User")}"
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+
+            <div class="user-avatar avatar-initial"
+                 style="display:none;">
+                ${getInitial(user.name)}
+            </div>
+        `;
+            }
+
+            return `
+        <div class="user-avatar avatar-initial">
+            ${getInitial(user.name)}
+        </div>
+    `;
+        }
+
+
+        function getInitial(name) {
+
+            if (!name) {
+                return "U";
+            }
+
+            return name.trim().charAt(0).toUpperCase();
+        }
+
+
+        function normalizeImagePath(path) {
+
+            if (!path) {
+                return "";
+            }
+
+            path = String(path).trim();
+
+            if (path.indexOf("~/") === 0) {
+                return path.substring(1);
+            }
+
+            if (path.indexOf("/") === 0) {
+                return path;
+            }
+
+            return "/" + path;
+        }
+
+        // ==========================================
+        // DATE FORMAT
+        // ==========================================
+
+        function formatMessageDate(dateValue) {
+
+            if (!dateValue) {
+                return "";
+            }
+
+
+            const date = new Date(dateValue);
+
+
+            if (isNaN(date.getTime())) {
+                return "";
+            }
+
+
+            let hours = date.getHours();
+
+            const minutes =
+                date.getMinutes()
+                    .toString()
+                    .padStart(2, "0");
+
+
+            const ampm =
+                hours >= 12
+                    ? "PM"
+                    : "AM";
+
+
+            hours =
+                hours % 12 || 12;
+
+
+            return hours + ":" + minutes + " " + ampm;
+
+        }
+
+
+        // ==========================================
+        // SCROLL
+        // ==========================================
+
+        function scrollMessagesToBottom() {
+
+            const area =
+                document.getElementById("messagesArea");
+
+            if (!area) {
+                return;
+            }
+
+            area.scrollTop = area.scrollHeight;
+
+        }
+
+
+        function isNearBottom(element) {
+
+            if (!element) {
+                return true;
+            }
+
+
+            return (
+                element.scrollHeight -
+                element.scrollTop -
+                element.clientHeight
+            ) < 120;
+
+        }
+
+
+        // ==========================================
+        // EMPTY USER LIST
+        // ==========================================
+
+        function showNoUsers(message) {
+
+            $("#userList").html(`
+
+                <div class="no-users">
+
+                    <i class="fas fa-user-slash"></i>
+
+                    <div>
+                        ${escapeHtml(message)}
+                    </div>
+
+                </div>
+
+            `);
+
+        }
+
+
+        // ==========================================
+        // CONVERSATION ERROR
+        // ==========================================
+
+        function showConversationError(message) {
+
+            $("#messagesArea").html(`
+
+                <div class="empty-conversation">
+
+                    <i class="fas fa-exclamation-circle"></i>
+
+                    <div>
+                        ${escapeHtml(message)}
+                    </div>
+
+                </div>
+
+            `);
+
+        }
+
+
+        // ==========================================
+        // HTML SECURITY
+        // ==========================================
+
+        function escapeHtml(value) {
+
+            if (value === null || value === undefined) {
+                return "";
+            }
+
+            return $("<div>")
+                .text(String(value))
+                .html();
+
+        }
+
+
+        function escapeAttribute(value) {
+
+            return escapeHtml(value)
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#39;");
+
+        }
+
+
+    })();
+             </script>

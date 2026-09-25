@@ -1,0 +1,204 @@
+﻿@{
+    ViewBag.Title = "Accountant Dashboard";
+    var currentUser = ViewBag.CurrentUser as CustomAuthentication.Models.User;
+}
+
+<div class="container-fluid px-4 py-4">
+
+    <!-- =========================
+         HEADER
+    ========================= -->
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2 class="fw-bold mb-1">
+                <i class="bi bi-graph-up text-warning me-2"></i>
+                Accountant Dashboard
+            </h2>
+            <p class="text-muted mb-0">
+                Welcome back@(currentUser != null ? ", " + currentUser.FullName : "")! Here's the financial overview.
+            </p>
+        </div>
+
+        <div class="mt-3 mt-md-0">
+            <span class="badge bg-warning text-dark px-3 py-2">
+                <i class="bi bi-calculator me-1"></i>
+                Accountant
+            </span>
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         SALES STAT CARDS (only if permitted)
+    ========================= -->
+
+    @if (ViewBag.TotalOrders != null)
+    {
+        <div class="row g-4 mb-4">
+
+            <div class="col-md-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100 dash-card">
+                    <div class="card-body p-4">
+                        <p class="text-muted mb-1">Today's Orders</p>
+                        <h2 class="fw-bold mb-2">@ViewBag.TodayOrders</h2>
+                        <p class="mb-0 text-muted small">Taka @(((decimal)ViewBag.TodayAmount).ToString("N2"))</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100 dash-card">
+                    <div class="card-body p-4">
+                        <p class="text-muted mb-1">This Month</p>
+                        <h2 class="fw-bold mb-2">@ViewBag.MonthOrders</h2>
+                        <p class="mb-0 text-muted small">Taka @(((decimal)ViewBag.MonthAmount).ToString("N2"))</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100 dash-card">
+                    <div class="card-body p-4">
+                        <p class="text-muted mb-1">Total Orders</p>
+                        <h2 class="fw-bold mb-2">@ViewBag.TotalOrders</h2>
+                        <a href="@Url.Action("Orders", "Admin")" class="btn btn-sm btn-outline-success">
+                            <i class="bi bi-bag-check me-1"></i> View Orders
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100 dash-card">
+                    <div class="card-body p-4">
+                        <p class="text-muted mb-1">Total Sales Amount</p>
+                        <h3 class="fw-bold mb-0">Taka @(((decimal)ViewBag.TotalAmount).ToString("N2"))</h3>
+                        <small class="text-muted">All-time total order value</small>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    }
+    else
+    {
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4 text-center text-muted">
+                <i class="bi bi-info-circle fs-2 d-block mb-2"></i>
+                You don't have access to Orders yet. Ask an Admin to grant you access below.
+            </div>
+        </div>
+    }
+
+
+    <!-- =========================
+         MY ACCESS
+    ========================= -->
+
+    <div class="d-flex align-items-center mb-3">
+        <h4 class="fw-bold mb-0">
+            <i class="bi bi-shield-check text-warning me-2"></i>
+            My Access
+        </h4>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+
+            @if (currentUser == null)
+            {
+                <p class="text-muted mb-0">Unable to load your permission details.</p>
+            }
+            else
+            {
+                <div class="row g-3">
+
+                    <div class="col-md-4">
+                        <div class="access-row @(currentUser.CanViewOrders ? "access-on" : "access-off")">
+                            <i class="bi @(currentUser.CanViewOrders ? "bi-check-circle-fill" : "bi-x-circle")"></i>
+                            View Orders
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="access-row @(currentUser.CanAddOrders ? "access-on" : "access-off")">
+                            <i class="bi @(currentUser.CanAddOrders ? "bi-check-circle-fill" : "bi-x-circle")"></i>
+                            Add Orders
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="access-row @(currentUser.CanEditOrders ? "access-on" : "access-off")">
+                            <i class="bi @(currentUser.CanEditOrders ? "bi-check-circle-fill" : "bi-x-circle")"></i>
+                            Edit Orders
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="access-row @(currentUser.CanDeleteOrders ? "access-on" : "access-off")">
+                            <i class="bi @(currentUser.CanDeleteOrders ? "bi-check-circle-fill" : "bi-x-circle")"></i>
+                            Delete Orders
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="access-row @(currentUser.CanViewReports ? "access-on" : "access-off")">
+                            <i class="bi @(currentUser.CanViewReports ? "bi-check-circle-fill" : "bi-x-circle")"></i>
+                            View Reports
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="access-row @(currentUser.CanViewProducts ? "access-on" : "access-off")">
+                            <i class="bi @(currentUser.CanViewProducts ? "bi-check-circle-fill" : "bi-x-circle")"></i>
+                            View Products
+                        </div>
+                    </div>
+
+                </div>
+
+                <hr class="my-3" />
+
+                <p class="text-muted mb-0 small">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Need more access? Ask your Admin to update your permissions from Manage Users.
+                </p>
+            }
+
+        </div>
+    </div>
+
+</div>
+
+
+<style>
+
+    .dash-card {
+        transition: all 0.25s ease;
+        border-radius: 14px;
+    }
+    .dash-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.10) !important;
+    }
+    .card { border-radius: 14px; }
+
+    .access-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 14px;
+        border-radius: 10px;
+        font-weight: 500;
+        font-size: .92rem;
+    }
+    .access-on {
+        background: #fff6e0;
+        color: #8a6d1c;
+    }
+    .access-off {
+        background: #f4f4f6;
+        color: #9aa0a6;
+    }
+    .access-row i { font-size: 1.05rem; }
+
+</style>

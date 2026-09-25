@@ -1,0 +1,149 @@
+﻿@model CustomAuthentication.ViewModel.PurchaseViewModel
+@using System.Web
+
+@{
+    ViewBag.Title = "New Purchase";
+}
+
+<style>
+    .glass-card { background: rgba(255,255,255,0.55); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.6); border-radius: 20px; box-shadow: 0 8px 32px rgba(124,58,237,0.15); }
+    .title-grad { background: linear-gradient(90deg,#3B82F6,#7C3AED); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .frm-control, .frm-control:focus, select.frm-control { background: rgba(255,255,255,0.7); border: 1px solid rgba(124,58,237,0.25); box-shadow: none; }
+    .frm-control:focus { border-color: #7C3AED; box-shadow: 0 0 0 0.2rem rgba(124,58,237,0.15); }
+    .lbl { color: #24324A; font-weight: 600; }
+    .btn-glass { border: none; border-radius: 10px; padding: 10px 22px; background: linear-gradient(90deg,#3B82F6,#7C3AED); color:#fff; font-weight:600; box-shadow: 4px 4px 10px rgba(124,58,237,0.25); }
+    .btn-glass:hover { color:#fff; opacity:.92; }
+    .btn-ghost { border: none; border-radius: 10px; padding: 10px 22px; background: linear-gradient(145deg,#ffffff,#EDE9FE); color:#7C3AED; font-weight:600; box-shadow: 4px 4px 10px rgba(124,58,237,0.15), -4px -4px 10px rgba(255,255,255,0.9); }
+    .btn-ghost:hover { color:#7C3AED; text-decoration:none; }
+    .btn-ghost-sm { border: none; border-radius: 8px; padding: 6px 14px; background: linear-gradient(145deg,#ffffff,#EDE9FE); color:#7C3AED; font-weight:600; font-size:.85rem; }
+    .row-remove { border:none; background:transparent; color:#EF4444; font-size:1.1rem; }
+</style>
+
+<div class="container py-5">
+    @Html.Partial("_BackBar", new List<CustomAuthentication.ViewModel.BackBarLink>
+    {
+        new CustomAuthentication.ViewModel.BackBarLink("Dashboard", "Admin", "Dashboard"),
+        new CustomAuthentication.ViewModel.BackBarLink("Purchases", "Purchase", "Index")
+    })
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold mb-0 title-grad"><i class="bi bi-box-arrow-in-down me-2"></i>New Purchase</h2>
+        <a href="@Url.Action("Index")" class="btn-ghost"><i class="bi bi-arrow-left me-1"></i>Back</a>
+    </div>
+
+    @using (Html.BeginForm("Create", "Purchase", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+
+        <div class="glass-card p-4 mb-4">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    @Html.Label("SupplierId", "Supplier", new { @class = "form-label lbl" })
+                    @Html.DropDownListFor(m => m.SupplierId, Model.SupplierOptions, "-- Select Supplier --", new { @class = "form-select frm-control" })
+                </div>
+                <div class="col-md-4">
+                    @Html.Label("WarehouseId", "Receiving Warehouse", new { @class = "form-label lbl" })
+                    @Html.DropDownListFor(m => m.WarehouseId, Model.WarehouseOptions, "-- Select Warehouse --", new { @class = "form-select frm-control" })
+                </div>
+                <div class="col-md-4">
+                    @Html.LabelFor(m => m.PurchaseDate, new { @class = "form-label lbl" })
+                    @Html.TextBoxFor(m => m.PurchaseDate, "{0:yyyy-MM-dd}", new { @class = "form-control frm-control", type = "date" })
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card p-4 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0" style="color:#24324A;">Products</h5>
+                <button type="button" id="addRowBtn" class="btn-ghost-sm"><i class="bi bi-plus-lg"></i> Add Product</button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-middle" id="itemsTable">
+                    <thead><tr><th>Product</th><th style="width:120px;">Quantity</th><th style="width:150px;">Unit Cost</th><th style="width:130px;">Line Total</th><th style="width:40px;"></th></tr></thead>
+                    <tbody id="itemsBody"></tbody>
+                </table>
+            </div>
+
+            <div class="text-end fw-bold" style="color:#24324A;">
+                Subtotal: Taka <span id="subtotalDisplay">0.00</span>
+            </div>
+        </div>
+
+        <div class="glass-card p-4 mb-4">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    @Html.LabelFor(m => m.Discount, new { @class = "form-label lbl" })
+                    @Html.TextBoxFor(m => m.Discount, new { @class = "form-control frm-control", type = "number", step = "0.01", min = "0" })
+                </div>
+                <div class="col-md-6">
+                    @Html.LabelFor(m => m.Tax, new { @class = "form-label lbl" })
+                    @Html.TextBoxFor(m => m.Tax, new { @class = "form-control frm-control", type = "number", step = "0.01", min = "0" })
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2">
+            <a href="@Url.Action("Index")" class="btn-ghost">Cancel</a>
+            <button type="submit" class="btn-glass"><i class="bi bi-check-circle me-1"></i>Save Purchase</button>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        var productOptions = [
+            @foreach (var p in Model.ProductOptions)
+            {
+                @: { value: "@p.Value", text: "@Html.Raw(HttpUtility.JavaScriptStringEncode(p.Text))" },
+            }
+        ];
+
+        var rowIndex = 0;
+
+        function addRow() {
+            var tbody = document.getElementById("itemsBody");
+            var tr = document.createElement("tr");
+            tr.className = "item-row";
+
+            var optionsHtml = '<option value="">-- Select Product --</option>';
+            productOptions.forEach(function (p) {
+                optionsHtml += '<option value="' + p.value + '">' + p.text + '</option>';
+            });
+
+            tr.innerHTML =
+                '<td><select name="Items[' + rowIndex + '].ProductId" class="form-select frm-control product-select">' + optionsHtml + '</select></td>' +
+                '<td><input type="number" name="Items[' + rowIndex + '].Quantity" class="form-control frm-control qty-input" min="1" value="1" /></td>' +
+                '<td><input type="number" name="Items[' + rowIndex + '].UnitCost" class="form-control frm-control cost-input" min="0" step="0.01" value="0" /></td>' +
+                '<td class="line-total">0.00</td>' +
+                '<td><button type="button" class="row-remove" onclick="removeRow(this)"><i class="bi bi-trash3"></i></button></td>';
+
+            tbody.appendChild(tr);
+
+            tr.querySelector(".qty-input").addEventListener("input", updateTotals);
+            tr.querySelector(".cost-input").addEventListener("input", updateTotals);
+
+            rowIndex++;
+        }
+
+        function removeRow(btn) {
+            btn.closest("tr").remove();
+            updateTotals();
+        }
+
+        function updateTotals() {
+            var subtotal = 0;
+            document.querySelectorAll(".item-row").forEach(function (row) {
+                var qty = parseFloat(row.querySelector(".qty-input").value) || 0;
+                var cost = parseFloat(row.querySelector(".cost-input").value) || 0;
+                var lineTotal = qty * cost;
+                row.querySelector(".line-total").textContent = lineTotal.toFixed(2);
+                subtotal += lineTotal;
+            });
+            document.getElementById("subtotalDisplay").textContent = subtotal.toFixed(2);
+        }
+
+        document.getElementById("addRowBtn").addEventListener("click", addRow);
+        addRow();
+    </script>
+}

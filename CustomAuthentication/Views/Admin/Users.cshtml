@@ -1,0 +1,54 @@
+﻿@model IEnumerable<CustomAuthentication.ViewModel.AdminUserViewModel>
+@{ ViewBag.Title = "Users Overview"; }
+<style>
+.glass-card{background:rgba(255,255,255,.55);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.6);border-radius:20px;box-shadow:0 8px 32px rgba(124,58,237,.15);}
+.title-grad{background:linear-gradient(90deg,#3B82F6,#7C3AED);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.btn-ghost{border:none;border-radius:10px;padding:8px 18px;background:linear-gradient(145deg,#ffffff,#EDE9FE);color:#7C3AED;font-weight:600;}
+.btn-ghost:hover{color:#7C3AED;text-decoration:none;}
+.user-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(145deg,#ffffff,#EDE9FE);color:#7C3AED;display:flex;align-items:center;justify-content:center;font-weight:700;}
+</style>
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div><h2 class="fw-bold mb-1 title-grad"><i class="bi bi-people-fill me-2"></i>Users Overview</h2><p class="mb-0" style="color:#64748B;">Read-only summary of every staff account</p></div>
+        <div class="d-flex gap-2">
+            <a href="@Url.Action("Dashboard", "Admin")" class="btn-ghost"><i class="bi bi-arrow-left me-1"></i>Dashboard</a>
+            <a href="@Url.Action("Index", "User")" class="btn-ghost"><i class="bi bi-pencil-square me-1"></i>Manage Users</a>
+        </div>
+    </div>
+    <div class="glass-card">
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead><tr><th class="ps-4">User</th><th>Role</th><th>Warehouse</th><th>Phone</th><th>Can View Orders</th><th>Status</th><th class="text-end pe-4">Joined</th></tr></thead>
+                <tbody>
+                @if (!Model.Any()) { <tr><td colspan="7" class="text-center py-4" style="color:#64748B;">No users yet.</td></tr> }
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="user-avatar">@item.FullName.Substring(0,1).ToUpper()</div>
+                                <div>
+                                    <div class="fw-semibold" style="color:#24324A;">@item.FullName</div>
+                                    <div style="color:#64748B;font-size:.8rem;">@item.Email</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="badge" style="background:linear-gradient(90deg,#3B82F6,#7C3AED);color:#fff;">@item.RoleName</span></td>
+                        <td style="color:#64748B;">@(item.WarehouseName ?? "-")</td>
+                        <td style="color:#64748B;">@item.Phone</td>
+                        <td>
+                            @if (item.CanViewOrders) { <span class="badge bg-info text-dark">Yes</span> }
+                            else { <span class="badge bg-secondary">No</span> }
+                        </td>
+                        <td>
+                            @if (item.IsActive) { <span class="badge bg-success">Active</span> }
+                            else { <span class="badge bg-secondary">Inactive</span> }
+                        </td>
+                        <td class="text-end pe-4" style="color:#64748B;">@item.CreateDate.ToString("dd MMM yyyy")</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

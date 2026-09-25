@@ -1,0 +1,75 @@
+﻿@model CustomAuthentication.ViewModel.Cart
+@{ ViewBag.Title = "My Cart"; }
+<style>
+.glass-card{background:rgba(255,255,255,.55);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.6);border-radius:20px;box-shadow:0 8px 32px rgba(124,58,237,.15);}
+.title-grad{background:linear-gradient(90deg,#3B82F6,#7C3AED);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.btn-glass{border:none;border-radius:10px;padding:10px 24px;background:linear-gradient(90deg,#3B82F6,#7C3AED);color:#fff;font-weight:600;}
+.btn-glass:hover{color:#fff;text-decoration:none;opacity:.92;}
+.btn-ghost{border:none;border-radius:10px;padding:8px 16px;background:linear-gradient(145deg,#ffffff,#EDE9FE);color:#7C3AED;font-weight:600;}
+.btn-ghost:hover{color:#7C3AED;text-decoration:none;}
+.cart-img{width:70px;height:70px;object-fit:cover;border-radius:12px;}
+.cart-img-placeholder{width:70px;height:70px;display:flex;align-items:center;justify-content:center;background:linear-gradient(145deg,#ffffff,#EDE9FE);color:#7C3AED;border-radius:12px;}
+.qty-input{width:70px;}
+</style>
+<div class="container py-5">
+    <h2 class="fw-bold title-grad mb-4"><i class="bi bi-cart3 me-2"></i>My Cart</h2>
+
+    @if (TempData["Success"] != null) { <div class="alert alert-success">@TempData["Success"]</div> }
+    @if (TempData["Error"] != null) { <div class="alert alert-danger">@TempData["Error"]</div> }
+
+    @if (Model == null || Model.Count == 0)
+    {
+        <div class="glass-card p-5 text-center">
+            <i class="bi bi-cart-x" style="font-size:2.5rem;color:#7C3AED;"></i>
+            <p class="mt-2 mb-3" style="color:#64748B;">Your cart is empty.</p>
+            <a href="@Url.Action("Index","Home")" class="btn-glass">Start Shopping</a>
+        </div>
+    }
+    else
+    {
+        <div class="glass-card p-3 mb-4">
+            @foreach (var item in Model)
+            {
+                <div class="d-flex align-items-center gap-3 py-3" style="border-bottom:1px solid rgba(124,58,237,.12);">
+                    @if (!string.IsNullOrEmpty(item.ImagePath))
+                    {
+                        <img src="@Url.Content(item.ImagePath)" class="cart-img" />
+                    }
+                    else
+                    {
+                        <div class="cart-img-placeholder"><i class="bi bi-image"></i></div>
+                    }
+                    <div class="flex-grow-1">
+                        <div class="fw-semibold" style="color:#24324A;">@item.ProductName</div>
+                        <div style="color:#64748B;">Taka @item.UnitPrice.ToString("N2") each</div>
+                    </div>
+                    @using (Html.BeginForm("UpdateCartItem", "Shop", FormMethod.Post, new { @class = "d-flex align-items-center gap-2" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="productId" value="@item.ProductId" />
+                        <input type="number" name="quantity" value="@item.Quantity" min="1" class="form-control qty-input" onchange="this.form.submit()" />
+                    }
+                    <div class="fw-bold" style="color:#24324A;width:100px;text-align:right;">Taka @item.LineTotal.ToString("N2")</div>
+                    @using (Html.BeginForm("RemoveFromCart", "Shop", FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="productId" value="@item.ProductId" />
+                        <button type="submit" class="btn-ghost"><i class="bi bi-trash3"></i></button>
+                    }
+                </div>
+            }
+        </div>
+
+        <div class="glass-card p-4">
+            <div class="d-flex justify-content-between mb-3">
+                <span class="fw-semibold" style="color:#24324A;">Subtotal</span>
+                <span class="fw-bold title-grad">Taka @Model.Sum(i => i.LineTotal).ToString("N2")</span>
+            </div>
+            <p style="color:#64748B;" class="small mb-3">Delivery charge (TK60 Dhaka / TK120 outside Dhaka) is added at checkout.</p>
+            <div class="d-flex justify-content-between">
+                <a href="@Url.Action("Index","Home")" class="btn-ghost">Continue Shopping</a>
+                <a href="@Url.Action("Checkout")" class="btn-glass">Proceed to Checkout <i class="bi bi-arrow-right ms-1"></i></a>
+            </div>
+        </div>
+    }
+</div>

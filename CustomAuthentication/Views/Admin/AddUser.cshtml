@@ -1,0 +1,257 @@
+﻿@model CustomAuthentication.Models.User
+
+@{
+    ViewBag.Title = "Add New User";
+}
+
+<div class="container mt-4">
+
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2 class="fw-bold mb-1">
+                <i class="bi bi-person-plus-fill text-primary me-2"></i>
+                Add New User
+            </h2>
+
+            <p class="text-muted mb-0">
+                Create a new user account
+            </p>
+        </div>
+
+        @Html.Partial("_BackBar", new List<CustomAuthentication.ViewModel.BackBarLink>
+        {
+            new CustomAuthentication.ViewModel.BackBarLink("Dashboard", "Admin", "Dashboard"),
+            new CustomAuthentication.ViewModel.BackBarLink("Manage Users", "Admin", "ManageUsers")
+        })
+
+    </div>
+
+
+    <!-- Card -->
+    <div class="card shadow-sm border-0">
+
+        <!-- Card Header -->
+        <div class="card-header bg-primary text-white py-3">
+
+            <h5 class="mb-0">
+                <i class="bi bi-person-plus-fill me-2"></i>
+                User Information
+            </h5>
+
+        </div>
+
+
+        <!-- Card Body -->
+        <div class="card-body p-4">
+
+
+            <!-- ERROR MESSAGE -->
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger">
+
+                    <h6 class="fw-bold mb-2">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        Please fix the following errors:
+                    </h6>
+
+                    @Html.ValidationSummary(
+                        false,
+                        "",
+                        new { @class = "mb-0" }
+                    )
+
+                </div>
+            }
+
+
+            <!-- FORM -->
+            @using (Html.BeginForm(
+                "AddUser",
+                "Admin",
+                FormMethod.Post,
+                new { @class = "needs-validation" }))
+            {
+                @Html.AntiForgeryToken()
+
+
+                <!-- Full Name -->
+                <div class="mb-3">
+
+                    @Html.LabelFor(
+                        m => m.FullName,
+                        new { @class = "form-label fw-semibold" })
+
+                    @Html.TextBoxFor(
+                        m => m.FullName,
+                        new
+                        {
+                            @class = "form-control",
+                            placeholder = "Enter full name"
+                        })
+
+                    @Html.ValidationMessageFor(
+                        m => m.FullName,
+                        "",
+                        new { @class = "text-danger" })
+
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">
+                        Phone
+                    </label>
+
+                    @Html.TextBoxFor(
+                        m => m.Phone,
+                        new
+                        {
+                            @class = "form-control",
+                            placeholder = "Enter phone number"
+                        }
+                    )
+
+                    @Html.ValidationMessageFor(
+                        m => m.Phone,
+                        "",
+                        new { @class = "text-danger" }
+                    )
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">
+                        Address
+                    </label>
+
+                    @Html.TextBoxFor(
+                        m => m.Address,
+                        new
+                        {
+                            @class = "form-control",
+                            placeholder = "Enter address"
+                        }
+                    )
+
+                    @Html.ValidationMessageFor(
+                        m => m.Address,
+                        "",
+                        new { @class = "text-danger" }
+                    )
+                </div>
+
+
+                <!-- Email -->
+                <div class="mb-3">
+
+                    @Html.LabelFor(
+                        m => m.Email,
+                        new { @class = "form-label fw-semibold" })
+
+                    @Html.TextBoxFor(
+                        m => m.Email,
+                        new
+                        {
+                            @class = "form-control",
+                            type = "email",
+                            placeholder = "example@email.com"
+                        })
+
+                    @Html.ValidationMessageFor(
+                        m => m.Email,
+                        "",
+                        new { @class = "text-danger" })
+
+                </div>
+
+
+                <!-- Password -->
+                <div class="mb-3">
+
+                    <label class="form-label fw-semibold">
+                        Password
+                    </label>
+
+                    <input type="password"
+                           name="Password"
+                           class="form-control"
+                           placeholder="Enter password"
+                           autocomplete="new-password" />
+
+                    @Html.ValidationMessage(
+                        "Password",
+                        "",
+                        new { @class = "text-danger" })
+
+                </div>
+
+
+                <!-- Role -->
+                <div class="mb-3">
+
+                    @Html.LabelFor(
+                        m => m.RoleName,
+                        new { @class = "form-label fw-semibold" })
+
+                    @Html.DropDownList(
+                        "RoleName",
+                        (SelectList)ViewBag.Roles,
+                        "-- Select Role --",
+                        new { @class = "form-select" })
+
+                    @Html.ValidationMessageFor(
+                        m => m.RoleName,
+                        "",
+                        new { @class = "text-danger" })
+
+                </div>
+
+
+                <!-- Active Status -->
+                <div class="mb-4">
+
+                    <div class="form-check form-switch">
+
+                        @Html.CheckBoxFor(
+                            m => m.IsActive,
+                            new { @class = "form-check-input" })
+
+                        @Html.LabelFor(
+                            m => m.IsActive,
+                            new { @class = "form-check-label fw-semibold" })
+
+                    </div>
+
+                </div>
+
+
+                <!-- Buttons -->
+                <div class="d-flex gap-2">
+
+                    <button type="submit"
+                            class="btn btn-primary px-4">
+
+                        <i class="bi bi-person-plus-fill me-1"></i>
+                        Add User
+
+                    </button>
+
+
+                    <a href="@Url.Action("ManageUsers", "Admin")"
+                       class="btn btn-outline-secondary">
+
+                        <i class="bi bi-x-lg me-1"></i>
+                        Cancel
+
+                    </a>
+
+                </div>
+
+            }
+
+        </div>
+
+    </div>
+
+</div>

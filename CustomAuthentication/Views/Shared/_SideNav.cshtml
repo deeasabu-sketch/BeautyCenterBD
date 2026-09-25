@@ -1,0 +1,129 @@
+﻿@using System.Linq
+@* Permission-aware staff sidebar. Customers never render this partial. *@
+@{
+    bool canViewOrders = false;
+    bool canViewProducts = false;
+    bool canViewCategories = false;
+    bool canViewBrands = false;
+    bool canViewUnits = false;
+    bool canViewCustomers = false;
+    bool canViewSuppliers = false;
+    bool canViewPurchases = false;
+    bool canViewSales = false;
+    bool canViewSalaries = false;
+    bool canViewWarehouses = false;
+    bool canViewStockTransfers = false;
+    bool canManagePromoCodes = false;
+    bool canManageUsers = false;
+
+    using (var sideNavDb = new CustomAuthentication.Data.AppDbContext())
+    {
+        var sideNavUser = sideNavDb.Users.FirstOrDefault(u => u.Email == User.Identity.Name);
+        var sideNavPermissions = new CustomAuthentication.Service.PermissionService(sideNavDb);
+
+        if (sideNavUser != null)
+        {
+            canViewOrders = sideNavPermissions.CanView(sideNavUser, "Orders");
+            canViewProducts = sideNavPermissions.CanView(sideNavUser, "Products");
+            canViewCategories = sideNavPermissions.CanView(sideNavUser, "Categories");
+            canViewBrands = sideNavPermissions.CanView(sideNavUser, "Brands");
+            canViewUnits = sideNavPermissions.CanView(sideNavUser, "Units");
+            canViewCustomers = sideNavPermissions.CanView(sideNavUser, "Customers");
+            canViewSuppliers = sideNavPermissions.CanView(sideNavUser, "Suppliers");
+            canViewPurchases = sideNavPermissions.CanView(sideNavUser, "Purchases");
+            canViewSales = sideNavPermissions.CanView(sideNavUser, "Sales");
+            canViewSalaries = sideNavPermissions.CanView(sideNavUser, "Salaries");
+            canViewWarehouses = sideNavPermissions.CanView(sideNavUser, "Warehouses");
+            canViewStockTransfers = sideNavPermissions.CanView(sideNavUser, "StockTransfers");
+            canManagePromoCodes = sideNavPermissions.CanView(sideNavUser, "PromoCodes");
+            canManageUsers = sideNavPermissions.CanView(sideNavUser, "Users");
+        }
+    }
+}
+
+<nav id="sideNav" aria-label="Staff navigation">
+    <a href="@Url.Action("Index", "Home")" class="side-link ajax-nav-link">
+        <i class="bi bi-house-door-fill"></i><span>Home</span>
+    </a>
+
+    @if (canViewOrders)
+    {
+        <div class="side-section-label">Orders</div>
+        <a href="@Url.Action("Orders", "Admin")" class="side-link ajax-nav-link">
+            <i class="bi bi-cart-check-fill"></i><span>Order Management</span>
+        </a>
+    }
+
+    @if (canViewProducts || canViewCategories || canViewBrands || canViewUnits)
+    {
+        <div class="side-section-label">Catalog</div>
+        if (canViewProducts)
+        {
+            <a href="@Url.Action("Index", "Product")" class="side-link ajax-nav-link"><i class="bi bi-box-seam-fill"></i><span>Products</span></a>
+        }
+        if (canViewCategories)
+        {
+            <a href="@Url.Action("Index", "Category")" class="side-link ajax-nav-link"><i class="bi bi-tags-fill"></i><span>Categories</span></a>
+        }
+        if (canViewBrands)
+        {
+            <a href="@Url.Action("Index", "Brand")" class="side-link ajax-nav-link"><i class="bi bi-award-fill"></i><span>Brands</span></a>
+        }
+        if (canViewUnits)
+        {
+            <a href="@Url.Action("Index", "Unit")" class="side-link ajax-nav-link"><i class="bi bi-rulers"></i><span>Units</span></a>
+        }
+    }
+
+    @if (canManagePromoCodes)
+    {
+        <div class="side-section-label">Marketing</div>
+        <a href="@Url.Action("Index", "PromoCode")" class="side-link ajax-nav-link">
+            <i class="bi bi-tag-fill"></i><span>Promo Codes</span>
+        </a>
+    }
+
+    @if (canViewCustomers || canViewSuppliers || canViewPurchases || canViewSales || canViewSalaries || canViewWarehouses || canViewStockTransfers)
+    {
+        <div class="side-section-label">Business</div>
+        if (canViewCustomers)
+        {
+            <a href="@Url.Action("Index", "Customer")" class="side-link ajax-nav-link"><i class="bi bi-person-lines-fill"></i><span>Customers</span></a>
+        }
+        if (canViewSuppliers)
+        {
+            <a href="@Url.Action("Index", "Supplier")" class="side-link ajax-nav-link"><i class="bi bi-truck"></i><span>Suppliers</span></a>
+        }
+        if (canViewPurchases)
+        {
+            <a href="@Url.Action("Index", "Purchase")" class="side-link ajax-nav-link"><i class="bi bi-bag-plus-fill"></i><span>Purchases</span></a>
+        }
+        if (canViewSales)
+        {
+            <a href="@Url.Action("Index", "Sale")" class="side-link ajax-nav-link"><i class="bi bi-receipt-cutoff"></i><span>Sales</span></a>
+        }
+        if (canViewSalaries)
+        {
+            <a href="@Url.Action("Index", "Salary")" class="side-link ajax-nav-link"><i class="bi bi-cash-stack"></i><span>Salaries</span></a>
+        }
+        if (canViewWarehouses)
+        {
+            <a href="@Url.Action("Index", "Warehouse")" class="side-link ajax-nav-link"><i class="bi bi-building"></i><span>Warehouses</span></a>
+        }
+        if (canViewStockTransfers)
+        {
+            <a href="@Url.Action("Index", "StockTransfer")" class="side-link ajax-nav-link"><i class="bi bi-arrow-left-right"></i><span>Stock Transfers</span></a>
+        }
+    }
+
+    @if (canManageUsers)
+    {
+        <div class="side-section-label">Administration</div>
+        <a href="@Url.Action("Index", "User")" class="side-link ajax-nav-link">
+            <i class="bi bi-people-fill"></i><span>User Management</span>
+        </a>
+        <a href="@Url.Action("Index", "Permission")" class="side-link ajax-nav-link">
+            <i class="bi bi-shield-lock-fill"></i><span>Permissions</span>
+        </a>
+    }
+</nav>

@@ -1,0 +1,83 @@
+﻿@{
+    ViewBag.Title = "About";
+}
+
+<style>
+    .ab-glass {
+        background: rgba(255,255,255,0.55);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border: 1px solid rgba(255,255,255,0.6);
+        border-radius: 22px;
+        box-shadow: 0 8px 32px rgba(124,58,237,0.15);
+    }
+    .ab-title-grad {
+        background: linear-gradient(90deg,#3B82F6,#7C3AED);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .ab-icon-circle {
+        width: 60px; height: 60px;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 14px;
+        background: linear-gradient(145deg,#ffffff,#EDE9FE);
+        box-shadow: inset 3px 3px 6px rgba(124,58,237,0.15), inset -3px -3px 6px rgba(255,255,255,0.9);
+        font-size: 1.5rem;
+        color: #7C3AED;
+    }
+</style>
+
+<main aria-labelledby="title" class="py-5">
+
+    <div class="text-center mb-5">
+        <span class="hm-badge" style="display:inline-block;padding:6px 16px;border-radius:30px;background:linear-gradient(90deg,#3B82F6,#7C3AED);color:#fff;font-weight:600;font-size:.8rem;">
+            <i class="bi bi-info-circle"></i> About Us
+        </span>
+
+        <h2 id="title" class="fw-bold mt-3 ab-title-grad">About BeautyCenter BD</h2>
+        <p class="lead" style="color:#64748B;">Cosmetics Paikari Mokam — your trusted wholesale cosmetics marketplace</p>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-lg-8 mx-auto">
+            <div class="ab-glass p-4 p-md-5">
+                <p style="color:#24324A;">
+                    BeautyCenter BD is a wholesale cosmetics marketplace based in Dhaka, Bangladesh.
+                    We connect cosmetics retailers and shop owners with quality beauty products at
+                    competitive wholesale prices, backed by fast and reliable delivery.
+                </p>
+                <p class="mb-0" style="color:#24324A;">
+                    Our platform helps businesses manage their orders, track sales, and grow with
+                    confidence — all through one easy-to-use system.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="ab-glass text-center py-4 px-3 h-100">
+                <div class="ab-icon-circle"><i class="bi bi-bag-heart"></i></div>
+                <h5 class="fw-bold" style="color:#24324A;">Quality Products</h5>
+                <p class="mb-0" style="color:#64748B;">Carefully sourced cosmetics for wholesale customers.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="ab-glass text-center py-4 px-3 h-100">
+                <div class="ab-icon-circle"><i class="bi bi-currency-exchange"></i></div>
+                <h5 class="fw-bold" style="color:#24324A;">Competitive Price</h5>
+                <p class="mb-0" style="color:#64748B;">Attractive wholesale prices for your business.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="ab-glass text-center py-4 px-3 h-100">
+                <div class="ab-icon-circle"><i class="bi bi-truck"></i></div>
+                <h5 class="fw-bold" style="color:#24324A;">Easy Delivery</h5>
+                <p class="mb-0" style="color:#64748B;">Fast and convenient delivery for your orders.</p>
+            </div>
+        </div>
+    </div>
+
+</main>

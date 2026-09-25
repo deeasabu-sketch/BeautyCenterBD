@@ -1,0 +1,1480 @@
+﻿
+@model CustomAuthentication.ViewModel.CheckoutViewModel
+
+@{
+    ViewBag.Title = "Checkout";
+
+    decimal subtotal = Model.Cart.Sum(i => i.LineTotal);
+
+    decimal deliveryCharge =
+        Model.DeliveryArea == "Outside Dhaka"
+            ? 120
+            : 60;
+
+    decimal initialTotal =
+        subtotal + deliveryCharge;
+}
+
+<style>
+
+    /* =====================================================
+       CHECKOUT PAGE
+       ===================================================== */
+
+    .checkout-page {
+        background: #f7f8fc;
+        min-height: 100vh;
+        padding: 45px 0 70px;
+    }
+
+    .checkout-title {
+        font-size: 32px;
+        font-weight: 800;
+        color: #1f2937;
+        margin-bottom: 6px;
+    }
+
+    .checkout-subtitle {
+        color: #6b7280;
+        font-size: 15px;
+        margin-bottom: 30px;
+    }
+
+
+    /* =====================================================
+       COMMON CARD
+       ===================================================== */
+
+    .checkout-card {
+        background: #ffffff;
+        border: 1px solid #e9ebf0;
+        border-radius: 18px;
+        box-shadow: 0 8px 30px rgba(15, 23, 42, 0.06);
+        overflow: hidden;
+    }
+
+    .checkout-card-header {
+        padding: 22px 24px;
+        border-bottom: 1px solid #eef0f4;
+        background: #ffffff;
+    }
+
+    .checkout-card-body {
+        padding: 24px;
+    }
+
+    .section-title {
+        font-size: 18px;
+        font-weight: 750;
+        color: #1f2937;
+        margin: 0;
+    }
+
+    .section-subtitle {
+        color: #8a919d;
+        font-size: 13px;
+        margin-top: 4px;
+    }
+
+
+    /* =====================================================
+       FORM
+       ===================================================== */
+
+    .checkout-label {
+        display: block;
+        color: #374151;
+        font-size: 14px;
+        font-weight: 650;
+        margin-bottom: 8px;
+    }
+
+    .checkout-input {
+        width: 100%;
+        min-height: 46px;
+        border: 1px solid #dfe3e8;
+        border-radius: 10px;
+        padding: 10px 13px;
+        background: #fff;
+        color: #1f2937;
+        font-size: 14px;
+        transition: all .2s ease;
+    }
+
+        .checkout-input:focus {
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, .10);
+            outline: none;
+        }
+
+    textarea.checkout-input {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+
+    /* =====================================================
+       DELIVERY AREA
+       ===================================================== */
+
+    .delivery-option {
+        position: relative;
+        display: block;
+        cursor: pointer;
+        margin: 0;
+    }
+
+    .delivery-radio {
+        display: none;
+    }
+
+    .delivery-box {
+        border: 1.5px solid #e2e5eb;
+        border-radius: 13px;
+        padding: 15px;
+        background: #fff;
+        transition: all .2s ease;
+    }
+
+        .delivery-box:hover {
+            border-color: #b7a3f8;
+            transform: translateY(-1px);
+        }
+
+    .delivery-radio:checked + .delivery-box {
+        border-color: #7c3aed;
+        background: #faf8ff;
+        box-shadow: 0 4px 14px rgba(124, 58, 237, .10);
+    }
+
+    .delivery-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .delivery-name {
+        font-weight: 700;
+        color: #374151;
+        font-size: 14px;
+    }
+
+    .delivery-price {
+        font-weight: 800;
+        color: #7c3aed;
+        font-size: 14px;
+    }
+
+    .delivery-desc {
+        color: #9ca3af;
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    .delivery-check {
+        display: none;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        align-items: center;
+        justify-content: center;
+        background: #7c3aed;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .delivery-radio:checked + .delivery-box
+    .delivery-check {
+        display: flex;
+    }
+
+
+    /* =====================================================
+       PAYMENT
+       ===================================================== */
+
+    .payment-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+    }
+
+    .payment-option {
+        display: block;
+        cursor: pointer;
+        margin: 0;
+    }
+
+    .payment-radio {
+        display: none;
+    }
+
+    .payment-box {
+        position: relative;
+        min-height: 125px;
+        border: 1.5px solid #e2e5eb;
+        border-radius: 14px;
+        padding: 17px;
+        background: #fff;
+        transition: all .2s ease;
+    }
+
+        .payment-box:hover {
+            border-color: #b7a3f8;
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(15, 23, 42, .07);
+        }
+
+    .payment-radio:checked + .payment-box {
+        border-color: #7c3aed;
+        background: #faf8ff;
+        box-shadow: 0 7px 22px rgba(124, 58, 237, .10);
+    }
+
+    .payment-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 11px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 800;
+        margin-bottom: 13px;
+    }
+
+    .bkash-icon {
+        background: #e2136e;
+    }
+
+    .nagad-icon {
+        background: #f58220;
+    }
+
+    .cod-icon {
+        background: #374151;
+    }
+
+    .payment-name {
+        color: #1f2937;
+        font-size: 14px;
+        font-weight: 750;
+        margin-bottom: 3px;
+    }
+
+    .payment-desc {
+        color: #9ca3af;
+        font-size: 11px;
+        line-height: 1.4;
+    }
+
+    .payment-check {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: 21px;
+        height: 21px;
+        border-radius: 50%;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: #7c3aed;
+        color: #fff;
+        font-size: 11px;
+    }
+
+    .payment-radio:checked + .payment-box
+    .payment-check {
+        display: flex;
+    }
+
+
+    /* =====================================================
+       ORDER SUMMARY
+       ===================================================== */
+
+    .summary-card {
+        position: sticky;
+        top: 25px;
+    }
+
+    .product-list {
+        max-height: 280px;
+        overflow-y: auto;
+        padding-right: 4px;
+    }
+
+    .product-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 11px 0;
+        border-bottom: 1px solid #f0f1f4;
+    }
+
+        .product-item:last-child {
+            border-bottom: none;
+        }
+
+    .product-image {
+        width: 52px;
+        height: 52px;
+        border-radius: 10px;
+        background: #f3f4f6;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+
+    .product-placeholder {
+        width: 52px;
+        height: 52px;
+        border-radius: 10px;
+        background: #f3f4f6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #9ca3af;
+        flex-shrink: 0;
+    }
+
+    .product-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .product-name {
+        color: #374151;
+        font-size: 13px;
+        font-weight: 650;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .product-qty {
+        color: #9ca3af;
+        font-size: 12px;
+        margin-top: 3px;
+    }
+
+    .product-price {
+        color: #1f2937;
+        font-size: 13px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+
+    /* =====================================================
+       PROMO
+       ===================================================== */
+
+    .promo-box {
+        margin-top: 18px;
+        padding-top: 18px;
+        border-top: 1px solid #eef0f4;
+    }
+
+    .promo-label {
+        color: #374151;
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .promo-input {
+        height: 44px;
+        border-radius: 9px 0 0 9px !important;
+        border-right: none !important;
+    }
+
+    .promo-btn {
+        height: 44px;
+        border-radius: 0 9px 9px 0 !important;
+        padding: 0 17px;
+        font-size: 13px;
+        font-weight: 700;
+        background: #f3f4f6;
+        border: 1px solid #dfe3e8;
+        color: #374151;
+    }
+
+        .promo-btn:hover {
+            background: #e9eaf0;
+        }
+
+    #promoMsg {
+        font-size: 12px;
+        margin-top: 7px;
+    }
+
+
+    /* =====================================================
+       TOTAL
+       ===================================================== */
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 7px 0;
+        color: #6b7280;
+        font-size: 14px;
+    }
+
+        .summary-row strong {
+            color: #374151;
+        }
+
+    .discount-value {
+        color: #16a34a !important;
+        font-weight: 700;
+    }
+
+    .total-row {
+        border-top: 1px solid #e5e7eb;
+        margin-top: 9px;
+        padding-top: 17px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .total-label {
+        color: #1f2937;
+        font-size: 17px;
+        font-weight: 800;
+    }
+
+    .total-value {
+        color: #7c3aed;
+        font-size: 21px;
+        font-weight: 850;
+    }
+
+
+    /* =====================================================
+       PLACE ORDER BUTTON
+       ===================================================== */
+
+    .place-order-btn {
+        width: 100%;
+        border: none;
+        min-height: 50px;
+        border-radius: 11px;
+        margin-top: 20px;
+        background: linear-gradient( 135deg, #7c3aed, #9b5de5 );
+        color: #fff;
+        font-size: 15px;
+        font-weight: 750;
+        box-shadow: 0 8px 20px rgba(124, 58, 237, .22);
+        transition: all .2s ease;
+    }
+
+        .place-order-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 11px 25px rgba(124, 58, 237, .28);
+        }
+
+
+    /* =====================================================
+       SECURITY NOTE
+       ===================================================== */
+
+    .secure-note {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        color: #9ca3af;
+        font-size: 11px;
+        margin-top: 13px;
+    }
+
+
+    /* =====================================================
+       VALIDATION
+       ===================================================== */
+
+    .validation-summary {
+        border-radius: 12px;
+        font-size: 13px;
+    }
+
+
+    /* =====================================================
+       RESPONSIVE
+       ===================================================== */
+
+    @@media (max-width: 991px) {
+
+        .summary-card {
+            position: static;
+        }
+
+        .payment-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media (max-width: 576px) {
+
+        .checkout-page {
+            padding: 25px 0 50px;
+        }
+
+        .checkout-title {
+            font-size: 26px;
+        }
+
+        .checkout-card-body {
+            padding: 18px;
+        }
+
+        .checkout-card-header {
+            padding: 18px;
+        }
+
+        .payment-grid {
+            gap: 10px;
+        }
+
+        .payment-box {
+            min-height: auto;
+            display: flex;
+            align-items: center;
+            gap: 13px;
+        }
+
+        .payment-icon {
+            margin-bottom: 0;
+            flex-shrink: 0;
+        }
+    }
+</style>
+
+
+<div class="checkout-page">
+
+    <div class="container">
+
+        <!-- =================================================
+             PAGE HEADER
+             ================================================= -->
+
+        <div class="mb-4">
+
+            <div class="checkout-title">
+                <i class="bi bi-bag-check me-2"></i>
+                Checkout
+            </div>
+
+            <div class="checkout-subtitle">
+                Complete your delivery information and choose your payment method.
+            </div>
+
+        </div>
+
+
+        @using (Html.BeginForm(
+            "PlaceOrder",
+            "Shop",
+            FormMethod.Post,
+            new { id = "checkoutForm" }))
+        {
+
+            @Html.AntiForgeryToken()
+
+            @Html.ValidationSummary(
+                false,
+                "",
+                new
+                {
+                    @class = "alert alert-danger validation-summary mb-4"
+                })
+
+
+            <div class="row g-4">
+
+
+                <!-- =================================================
+                     LEFT SIDE
+                     ================================================= -->
+
+                <div class="col-lg-7">
+
+
+                    <!-- =============================================
+                         DELIVERY INFORMATION
+                         ============================================= -->
+
+                    <div class="checkout-card mb-4">
+
+                        <div class="checkout-card-header">
+
+                            <h5 class="section-title">
+                                <i class="bi bi-truck me-2"></i>
+                                Delivery Information
+                            </h5>
+
+                            <div class="section-subtitle">
+                                Where should we deliver your order?
+                            </div>
+
+                        </div>
+
+
+                        <div class="checkout-card-body">
+
+                            <!-- Full Name -->
+
+                            <div class="mb-3">
+
+                                @Html.LabelFor(
+                                    m => m.ShippingName,
+                                    "Full Name",
+                                    new { @class = "checkout-label" })
+
+                                @Html.TextBoxFor(
+                                    m => m.ShippingName,
+                                    new
+                                    {
+                                        @class = "checkout-input",
+                                        placeholder = "Enter your full name"
+                                    })
+
+                                @Html.ValidationMessageFor(
+                                    m => m.ShippingName,
+                                    "",
+                                    new { @class = "text-danger small" })
+
+                            </div>
+
+
+                            <!-- Phone -->
+
+                            <div class="mb-3">
+
+                                @Html.LabelFor(
+                                    m => m.ShippingPhone,
+                                    "Phone Number",
+                                    new { @class = "checkout-label" })
+
+                                @Html.TextBoxFor(
+                                    m => m.ShippingPhone,
+                                    new
+                                    {
+                                        @class = "checkout-input",
+                                        placeholder = "01XXXXXXXXX"
+                                    })
+
+                                @Html.ValidationMessageFor(
+                                    m => m.ShippingPhone,
+                                    "",
+                                    new { @class = "text-danger small" })
+
+                            </div>
+
+
+                            <!-- Address -->
+
+                            <div class="mb-4">
+
+                                @Html.LabelFor(
+                                    m => m.ShippingAddress,
+                                    "Delivery Address",
+                                    new { @class = "checkout-label" })
+
+                                @Html.TextAreaFor(
+                                    m => m.ShippingAddress,
+                                    new
+                                    {
+                                        @class = "checkout-input",
+                                        rows = "3",
+                                        placeholder = "House, road, area and full delivery address"
+                                    })
+
+                                @Html.ValidationMessageFor(
+                                    m => m.ShippingAddress,
+                                    "",
+                                    new { @class = "text-danger small" })
+
+                            </div>
+
+
+                            <!-- Delivery Area -->
+
+                            <div class="mb-4">
+
+                                <label class="checkout-label">
+                                    Delivery Area
+                                </label>
+
+
+                                <div class="row g-3">
+
+                                    <!-- Inside Dhaka -->
+
+                                    <div class="col-sm-6">
+
+                                        <label class="delivery-option">
+
+                                            <input type="radio"
+                                                   name="DeliveryArea"
+                                                   value="Dhaka"
+                                                   class="delivery-radio"
+                                                   @(Model.DeliveryArea == "Dhaka" ? "checked" : "")
+                                                   onchange="selectArea(this)" />
+
+
+                                            <div class="delivery-box">
+
+                                                <div class="delivery-top">
+
+                                                    <div>
+
+                                                        <div class="delivery-name">
+                                                            Inside Dhaka
+                                                        </div>
+
+                                                        <div class="delivery-desc">
+                                                            Delivery within Dhaka city
+                                                        </div>
+
+                                                    </div>
+
+                                                    <div class="delivery-check">
+                                                        ✓
+                                                    </div>
+
+                                                </div>
+
+                                                <div class="delivery-price mt-2">
+                                                    Taka 60
+                                                </div>
+
+                                            </div>
+
+                                        </label>
+
+                                    </div>
+
+
+                                    <!-- Outside Dhaka -->
+
+                                    <div class="col-sm-6">
+
+                                        <label class="delivery-option">
+
+                                            <input type="radio"
+                                                   name="DeliveryArea"
+                                                   value="Outside Dhaka"
+                                                   class="delivery-radio"
+                                                   @(Model.DeliveryArea == "Outside Dhaka" ? "checked" : "")
+                                                   onchange="selectArea(this)" />
+
+
+                                            <div class="delivery-box">
+
+                                                <div class="delivery-top">
+
+                                                    <div>
+
+                                                        <div class="delivery-name">
+                                                            Outside Dhaka
+                                                        </div>
+
+                                                        <div class="delivery-desc">
+                                                            Delivery outside Dhaka
+                                                        </div>
+
+                                                    </div>
+
+                                                    <div class="delivery-check">
+                                                        ✓
+                                                    </div>
+
+                                                </div>
+
+                                                <div class="delivery-price mt-2">
+                                                    Taka 120
+                                                </div>
+
+                                            </div>
+
+                                        </label>
+
+                                    </div>
+
+                                </div>
+
+
+                                @Html.ValidationMessageFor(
+                                    m => m.DeliveryArea,
+                                    "",
+                                    new { @class = "text-danger small" })
+
+                            </div>
+
+
+                            <!-- Warehouse -->
+
+                            <div>
+
+                                @Html.Label(
+                                    "WarehouseId",
+                                    "Ship From",
+                                    new { @class = "checkout-label" })
+
+                                @Html.DropDownListFor(
+                                    m => m.WarehouseId,
+                                    Model.WarehouseOptions,
+                                    "-- Select Warehouse --",
+                                    new
+                                    {
+                                        @class = "checkout-input"
+                                    })
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- =============================================
+                         PAYMENT METHOD
+                         ============================================= -->
+
+                    <div class="checkout-card mb-4">
+
+                        <div class="checkout-card-header">
+
+                            <h5 class="section-title">
+                                <i class="bi bi-credit-card me-2"></i>
+                                Payment Method
+                            </h5>
+
+                            <div class="section-subtitle">
+                                Select how you want to pay for your order.
+                            </div>
+
+                        </div>
+
+
+                        <div class="checkout-card-body">
+
+                            <div class="payment-grid">
+
+
+                                <!-- bKash -->
+
+                                <label class="payment-option">
+
+                                    <input type="radio"
+                                           name="PaymentMethod"
+                                           value="bKash"
+                                           class="payment-radio"
+                                           required />
+
+                                    <div class="payment-box">
+
+                                        <div class="payment-icon bkash-icon">
+                                            bKash
+                                        </div>
+
+                                        <div>
+
+                                            <div class="payment-name">
+                                                bKash
+                                            </div>
+
+                                            <div class="payment-desc">
+                                                Pay securely through bKash
+                                            </div>
+
+                                        </div>
+
+                                        <div class="payment-check">
+                                            ✓
+                                        </div>
+
+                                    </div>
+
+                                </label>
+
+
+                                <!-- Nagad -->
+
+                                <label class="payment-option">
+
+                                    <input type="radio"
+                                           name="PaymentMethod"
+                                           value="Nagad"
+                                           class="payment-radio" />
+
+                                    <div class="payment-box">
+
+                                        <div class="payment-icon nagad-icon">
+                                            Nagad
+                                        </div>
+
+                                        <div>
+
+                                            <div class="payment-name">
+                                                Nagad
+                                            </div>
+
+                                            <div class="payment-desc">
+                                                Pay securely through Nagad
+                                            </div>
+
+                                        </div>
+
+                                        <div class="payment-check">
+                                            ✓
+                                        </div>
+
+                                    </div>
+
+                                </label>
+
+
+                                <!-- COD -->
+
+                                <label class="payment-option">
+
+                                    <input type="radio"
+                                           name="PaymentMethod"
+                                           value="Cash on Delivery"
+                                           class="payment-radio" />
+
+                                    <div class="payment-box">
+
+                                        <div class="payment-icon cod-icon">
+                                            COD
+                                        </div>
+
+                                        <div>
+
+                                            <div class="payment-name">
+                                                Cash on Delivery
+                                            </div>
+
+                                            <div class="payment-desc">
+                                                Pay when your order arrives
+                                            </div>
+
+                                        </div>
+
+                                        <div class="payment-check">
+                                            ✓
+                                        </div>
+
+                                    </div>
+
+                                </label>
+
+
+                            </div>
+
+
+                            @Html.ValidationMessage(
+                                "PaymentMethod",
+                                "",
+                                new
+                                {
+                                    @class = "text-danger small d-block mt-3"
+                                })
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- =================================================
+                     RIGHT SIDE - ORDER SUMMARY
+                     ================================================= -->
+
+                <div class="col-lg-5">
+
+                    <div class="checkout-card summary-card">
+
+                        <div class="checkout-card-header">
+
+                            <h5 class="section-title">
+                                <i class="bi bi-receipt me-2"></i>
+                                Order Summary
+                            </h5>
+
+                            <div class="section-subtitle">
+                                Review your order before placing it.
+                            </div>
+
+                        </div>
+
+
+                        <div class="checkout-card-body">
+
+
+                            <!-- Product List -->
+
+                            <div class="product-list">
+
+                                @foreach (var item in Model.Cart)
+                                {
+
+                                    <div class="product-item">
+
+                                        @if (!string.IsNullOrWhiteSpace(item.ImagePath))
+                                        {
+
+                                            <img src="@Url.Content(item.ImagePath)"
+                                                 class="product-image"
+                                                 alt="@item.ProductName" />
+
+                                        }
+                                        else
+                                        {
+
+                                            <div class="product-placeholder">
+                                                <i class="bi bi-image"></i>
+                                            </div>
+
+                                        }
+
+
+                                        <div class="product-info">
+
+                                            <div class="product-name">
+                                                @item.ProductName
+                                            </div>
+
+                                            <div class="product-qty">
+                                                Qty: @item.Quantity
+                                            </div>
+
+                                        </div>
+
+
+                                        <div class="product-price">
+                                            Taka @item.LineTotal.ToString("N2")
+                                        </div>
+
+                                    </div>
+
+                                }
+
+                            </div>
+
+
+                            <!-- Promo -->
+
+                            <div class="promo-box">
+
+                                <div class="promo-label">
+                                    Promo Code
+                                </div>
+
+                                <div class="input-group">
+
+                                    <input type="text"
+                                           id="promoInput"
+                                           class="checkout-input promo-input"
+                                           placeholder="Enter promo code"
+                                           style="text-transform:uppercase;" />
+
+                                    <button type="button"
+                                            class="promo-btn"
+                                            onclick="applyPromo()">
+                                        Apply
+                                    </button>
+
+                                </div>
+
+
+                                <div id="promoMsg"></div>
+
+
+                                <input type="hidden"
+                                       id="PromoCode"
+                                       name="PromoCode"
+                                       value="" />
+
+                            </div>
+
+
+                            <!-- Summary -->
+
+                            <div class="mt-4">
+
+                                <!-- Subtotal -->
+
+                                <div class="summary-row">
+
+                                    <span>
+                                        Subtotal
+                                    </span>
+
+                                    <strong id="subtotalDisplay">
+                                        Taka @subtotal.ToString("N2")
+                                    </strong>
+
+                                </div>
+
+
+                                <!-- Delivery -->
+
+                                <div class="summary-row">
+
+                                    <span>
+                                        Delivery Charge
+                                    </span>
+
+                                    <strong id="deliveryDisplay">
+                                        Taka @deliveryCharge.ToString("N2")
+                                    </strong>
+
+                                </div>
+
+
+                                <!-- Discount -->
+
+                                <div class="summary-row"
+                                     id="discountRow"
+                                     style="display:none;">
+
+                                    <span>
+                                        Discount
+                                    </span>
+
+                                    <strong class="discount-value"
+                                            id="discountDisplay">
+                                        - Taka 0.00
+                                    </strong>
+
+                                </div>
+
+
+                                <!-- Total -->
+
+                                <div class="total-row">
+
+                                    <span class="total-label">
+                                        Total
+                                    </span>
+
+                                    <span class="total-value"
+                                          id="totalDisplay">
+
+                                        Taka @initialTotal.ToString("N2")
+
+                                    </span>
+
+                                </div>
+
+
+                                <!-- Submit -->
+
+                                <button type="submit"
+                                        class="place-order-btn">
+
+                                    <i class="bi bi-check-circle me-2"></i>
+
+                                    Place Order
+
+                                </button>
+
+
+                                <div class="secure-note">
+
+                                    <i class="bi bi-shield-check"></i>
+
+                                    Secure checkout
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        }
+
+    </div>
+
+</div>
+
+
+
+@section Scripts {
+
+    <script>
+
+    // =====================================================
+    // BASIC VALUES
+    // =====================================================
+
+    var subtotal =
+        parseFloat('@subtotal') || 0;
+
+    var discountAmount = 0;
+
+
+    // =====================================================
+    // DELIVERY AREA
+    // =====================================================
+
+    function selectArea(radio) {
+
+        recalcTotal();
+
+    }
+
+
+    // =====================================================
+    // RECALCULATE TOTAL
+    // =====================================================
+
+    function recalcTotal() {
+
+        var checked =
+            document.querySelector(
+                'input[name="DeliveryArea"]:checked'
+            );
+
+
+        var charge = 60;
+
+
+        if (checked &&
+            checked.value === "Outside Dhaka") {
+
+            charge = 120;
+
+        }
+
+
+        var total =
+            subtotal
+            + charge
+            - discountAmount;
+
+
+        if (total < 0) {
+
+            total = 0;
+
+        }
+
+
+        document.getElementById(
+            "deliveryDisplay"
+        ).textContent =
+            "Taka " + charge.toFixed(2);
+
+
+        document.getElementById(
+            "totalDisplay"
+        ).textContent =
+            "Taka " + total.toFixed(2);
+
+    }
+
+
+    // =====================================================
+    // PROMO CODE
+    // =====================================================
+
+    function applyPromo() {
+
+        var code =
+            document
+                .getElementById("promoInput")
+                .value
+                .trim();
+
+
+        var msg =
+            document.getElementById("promoMsg");
+
+
+        if (!code) {
+
+            msg.textContent =
+                "Please enter a promo code.";
+
+            msg.style.color =
+                "#dc3545";
+
+            return;
+
+        }
+
+
+        var tokenInput =
+            document.querySelector(
+                'input[name="__RequestVerificationToken"]'
+            );
+
+
+        var token =
+            tokenInput
+                ? tokenInput.value
+                : "";
+
+
+        var formData =
+            new URLSearchParams();
+
+
+        formData.append(
+            "code",
+            code
+        );
+
+
+        formData.append(
+            "__RequestVerificationToken",
+            token
+        );
+
+
+        fetch(
+            "@Url.Action("ApplyPromo", "Shop")",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/x-www-form-urlencoded"
+                },
+
+                body:
+                    formData.toString()
+            }
+        )
+
+        .then(function (res) {
+
+            if (!res.ok) {
+
+                throw new Error(
+                    "Server returned "
+                    + res.status
+                );
+
+            }
+
+            return res.json();
+
+        })
+
+        .then(function (data) {
+
+            msg.textContent =
+                data.message;
+
+
+            msg.style.color =
+                data.success
+                    ? "#16a34a"
+                    : "#dc3545";
+
+
+            if (data.success) {
+
+                discountAmount =
+                    parseFloat(
+                        data.discountAmount
+                    ) || 0;
+
+
+                document.getElementById(
+                    "PromoCode"
+                ).value = code;
+
+
+                document.getElementById(
+                    "discountRow"
+                ).style.display = "flex";
+
+
+                document.getElementById(
+                    "discountDisplay"
+                ).textContent =
+                    "- Taka "
+                    + discountAmount.toFixed(2);
+
+            }
+            else {
+
+                discountAmount = 0;
+
+
+                document.getElementById(
+                    "PromoCode"
+                ).value = "";
+
+
+                document.getElementById(
+                    "discountRow"
+                ).style.display = "none";
+
+            }
+
+
+            recalcTotal();
+
+        })
+
+        .catch(function (err) {
+
+            console.error(
+                "Promo error:",
+                err
+            );
+
+
+            msg.textContent =
+                "Invalid request or server error.";
+
+
+            msg.style.color =
+                "#dc3545";
+
+        });
+
+    }
+
+
+    // =====================================================
+    // INITIAL TOTAL
+    // =====================================================
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+
+            recalcTotal();
+
+        }
+    );
+
+    </script>
+
+}
+

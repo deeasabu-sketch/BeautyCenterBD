@@ -1,0 +1,74 @@
+﻿@model CustomAuthentication.Models.Order
+@{ ViewBag.Title = "Order Confirmation"; }
+<style>
+.glass-card{background:rgba(255,255,255,.55);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.6);border-radius:20px;box-shadow:0 8px 32px rgba(124,58,237,.15);}
+.title-grad{background:linear-gradient(90deg,#3B82F6,#7C3AED);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.btn-glass{border:none;border-radius:10px;padding:10px 22px;background:linear-gradient(90deg,#3B82F6,#7C3AED);color:#fff;font-weight:600;}
+.btn-glass:hover{color:#fff;text-decoration:none;opacity:.92;}
+.btn-ghost{border:none;border-radius:10px;padding:10px 22px;background:linear-gradient(145deg,#ffffff,#EDE9FE);color:#7C3AED;font-weight:600;}
+.btn-ghost:hover{color:#7C3AED;text-decoration:none;}
+.lbl{color:#64748B;font-size:.8rem;} .val{color:#24324A;font-weight:600;}
+.success-icon{width:70px;height:70px;border-radius:50%;background:linear-gradient(90deg,#4ade80,#22c55e);color:#fff;display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto;}
+</style>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="text-center mb-4">
+                    <div class="success-icon mb-3"><i class="bi bi-check-lg"></i></div>
+                    <h3 class="fw-bold title-grad">Order Placed Successfully!</h3>
+                    <p style="color:#64748B;">Thank you for shopping with us.</p>
+                </div>
+            }
+
+            <div class="glass-card p-4 mb-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h4 class="fw-bold title-grad mb-0">Invoice - @Model.OrderNumber</h4>
+                        <span style="color:#64748B;">@Model.OrderDate.ToString("dd MMM yyyy, hh:mm tt")</span>
+                    </div>
+                    @if (Model.OrderStatus == "Delivered") { <span class="badge bg-success">Delivered</span> }
+                    else if (Model.OrderStatus == "Cancelled") { <span class="badge bg-danger">Cancelled</span> }
+                    else if (Model.OrderStatus == "Shipped") { <span class="badge" style="background:#7C3AED;color:#fff;">Shipped</span> }
+                    else { <span class="badge bg-warning text-dark">@Model.OrderStatus</span> }
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6"><span class="lbl d-block">Deliver To</span><span class="val">@Model.ShippingName</span></div>
+                    <div class="col-md-6"><span class="lbl d-block">Phone</span><span class="val">@Model.ShippingPhone</span></div>
+                    <div class="col-12"><span class="lbl d-block">Address</span><span class="val">@Model.ShippingAddress</span></div>
+                    <div class="col-md-6"><span class="lbl d-block">Delivery Area</span><span class="val">@Model.DeliveryArea</span></div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0">
+                        <thead><tr><th>Product</th><th>Qty</th><th>Price</th><th class="text-end">Line Total</th></tr></thead>
+                        <tbody>
+                        @foreach (var item in Model.OrderItems)
+                        {
+                            <tr>
+                                <td class="val">@(item.Product?.ProductName ?? "-")</td>
+                                <td style="color:#64748B;">@item.Quantity</td>
+                                <td style="color:#64748B;">Taka @item.UnitPrice.ToString("N2")</td>
+                                <td class="text-end val">Taka @((item.Quantity * item.UnitPrice).ToString("N2"))</td>
+                            </tr>
+                        }
+                        </tbody>
+                        <tfoot>
+                            <tr><td colspan="3" class="text-end lbl">Subtotal</td><td class="text-end val">Taka @Model.SubTotal.ToString("N2")</td></tr>
+                            <tr><td colspan="3" class="text-end lbl">Delivery Charge (@Model.DeliveryArea)</td><td class="text-end val">Taka @Model.DeliveryCharge.ToString("N2")</td></tr>
+                            <tr><td colspan="3" class="text-end fw-bold" style="color:#24324A;">Total</td><td class="text-end fw-bold title-grad">Taka @Model.TotalAmount.ToString("N2")</td></tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <a href="@Url.Action("Index","Home")" class="btn-ghost"><i class="bi bi-shop me-1"></i>Continue Shopping</a>
+                <a href="@Url.Action("MyOrders")" class="btn-glass"><i class="bi bi-bag-check me-1"></i>My Orders</a>
+            </div>
+        </div>
+    </div>
+</div>

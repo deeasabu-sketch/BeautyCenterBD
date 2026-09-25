@@ -1,0 +1,274 @@
+﻿@model CustomAuthentication.Models.Order
+
+@{
+    ViewBag.Title = "Order Details";
+    bool canManage = ViewBag.CanManageOrders != null && (bool)ViewBag.CanManageOrders;
+
+    decimal subtotal = 0;
+    if (Model.OrderItems != null)
+    {
+        subtotal = Model.OrderItems.Sum(x => x.Quantity * x.UnitPrice);
+    }
+    decimal grandTotal = subtotal - Model.Discount + Model.Tax;
+}
+
+<style>
+    .od-glass {
+        background: rgba(255,255,255,0.55);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border: 1px solid rgba(255,255,255,0.6);
+        border-radius: 20px;
+        box-shadow: 0 8px 32px rgba(124,58,237,0.15);
+    }
+    .od-neu {
+        background: linear-gradient(145deg,#ffffff,#EDE9FE);
+        border: none;
+        border-radius: 16px;
+        box-shadow: 6px 6px 14px rgba(124,58,237,0.15), -6px -6px 14px rgba(255,255,255,0.9);
+    }
+    .od-title-grad {
+        background: linear-gradient(90deg,#3B82F6,#7C3AED);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .od-btn {
+        border: none; border-radius: 10px; padding: 10px 16px;
+        background: linear-gradient(90deg,#3B82F6,#7C3AED); color: #fff; font-weight: 600;
+        box-shadow: 4px 4px 10px rgba(124,58,237,0.25);
+    }
+    .od-btn:hover { color: #fff; opacity: .92; }
+    .od-btn-ghost {
+        border: none; border-radius: 10px; padding: 10px 16px;
+        background: linear-gradient(145deg,#ffffff,#EDE9FE); color: #7C3AED; font-weight: 600;
+        box-shadow: 4px 4px 10px rgba(124,58,237,0.15), -4px -4px 10px rgba(255,255,255,0.9);
+    }
+    .od-label { color:#64748B; font-size:.8rem; margin-bottom:2px; display:block; }
+    .od-section-title { color:#24324A; font-weight:700; }
+
+    .od-summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        font-size: .95rem;
+        color: #24324A;
+    }
+    .od-summary-row.discount span:last-child { color:#3B82F6; font-weight:600; }
+    .od-summary-row.tax span:last-child { color:#7C3AED; font-weight:600; }
+    .od-summary-total {
+        border-top: 2px solid rgba(124,58,237,0.25);
+        margin-top: 6px;
+        padding-top: 12px;
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: #3a2e46;
+    }
+
+    .od-table thead th {
+        background: #fff5fa;
+        color: #6b3fa0;
+        font-size: .85rem;
+    }
+</style>
+
+<div class="py-2">
+
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+        <div>
+            <h2 class="fw-bold mb-1 od-title-grad"><i class="bi bi-receipt me-2"></i>Order Details</h2>
+            <p class="mb-0" style="color:#64748B;">Full order breakdown and customer information</p>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a href="@Url.Action("Invoice", "Admin", new { id = Model.OrderId })" class="od-btn-ghost" target="_blank">
+                <i class="bi bi-printer me-1"></i> Invoice
+            </a>
+            <a href="javascript:history.back()" class="od-btn-ghost">
+                <i class="bi bi-arrow-left me-1"></i> Back
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            <i class="bi bi-check-circle me-2"></i>@TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            <i class="bi bi-exclamation-triangle me-2"></i>@TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row g-4">
+
+        <!-- LEFT COLUMN: Order Info + Customer + Items -->
+        <div class="col-lg-8">
+
+            <!-- Order Information -->
+            <div class="od-glass p-4 mb-4">
+                <h5 class="od-section-title mb-3">Order Information</h5>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <span class="od-label">Order ID</span>
+                        <h6 class="fw-bold">#@Model.OrderId</h6>
+                    </div>
+                    <div class="col-md-4">
+                        <span class="od-label">Order Number</span>
+                        <h6 class="fw-bold">@Model.OrderNumber</h6>
+                    </div>
+                    <div class="col-md-4">
+                        <span class="od-label">Order Date</span>
+                        <h6 class="fw-bold">@Model.OrderDate.ToString("dd MMM yyyy, hh:mm tt")</h6>
+                    </div>
+                    <div class="col-md-4">
+                        <span class="od-label">Status</span>
+                        @if (Model.OrderStatus == "Completed")
+                        {
+                            <span class="badge bg-success">Completed</span>
+                        }
+                        else if (Model.OrderStatus == "Processing")
+                        {
+                            <span class="badge" style="background:linear-gradient(90deg,#3B82F6,#7C3AED);">Processing</span>
+                        }
+                        else if (Model.OrderStatus == "Cancelled")
+                        {
+                            <span class="badge bg-danger">Cancelled</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning text-dark">@Model.OrderStatus</span>
+                        }
+                    </div>
+                    <div class="col-md-4">
+                        <span class="od-label">User ID</span>
+                        <h6 class="fw-bold">@Model.UserId</h6>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer Information -->
+            <div class="od-glass p-4 mb-4">
+                <h5 class="od-section-title mb-3"><i class="bi bi-person-circle me-1"></i>Customer Information</h5>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <span class="od-label">Phone</span>
+                        <h6 class="fw-bold">@(string.IsNullOrEmpty(Model.CustomerPhone) ? "-" : Model.CustomerPhone)</h6>
+                    </div>
+                    <div class="col-md-4">
+                        <span class="od-label">Email</span>
+                        <h6 class="fw-bold">@(string.IsNullOrEmpty(Model.CustomerEmail) ? "-" : Model.CustomerEmail)</h6>
+                    </div>
+                    <div class="col-md-4">
+                        <span class="od-label">Address</span>
+                        <h6 class="fw-bold">@(string.IsNullOrEmpty(Model.CustomerAddress) ? "-" : Model.CustomerAddress)</h6>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Items -->
+            <div class="od-glass p-3">
+                <h5 class="od-section-title mb-3 px-2"><i class="bi bi-cart3 me-1"></i>Order Items</h5>
+
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 od-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Product</th>
+                                <th class="text-center">Quantity</th>
+                                <th class="text-end">Unit Price</th>
+                                <th class="text-end">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.OrderItems != null && Model.OrderItems.Any())
+                            {
+                                int serial = 1;
+                                foreach (var item in Model.OrderItems)
+                                {
+                                    <tr>
+                                        <td>@serial</td>
+                                        <td>@(item.Product != null ? item.Product.ProductName : "Product")</td>
+                                        <td class="text-center">@item.Quantity</td>
+                                        <td class="text-end">Taka @item.UnitPrice.ToString("N2")</td>
+                                        <td class="text-end fw-semibold">Taka @item.TotalPrice.ToString("N2")</td>
+                                    </tr>
+                                    serial++;
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center py-4" style="color:#64748B;">No order items found.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- RIGHT COLUMN: Summary + Quick Actions -->
+        <div class="col-lg-4">
+
+            <!-- Amount Summary -->
+            <div class="od-glass p-4 mb-4">
+                <h5 class="od-section-title mb-3">Amount Summary</h5>
+
+                <div class="od-summary-row">
+                    <span>Subtotal</span>
+                    <span>Taka @subtotal.ToString("N2")</span>
+                </div>
+                <div class="od-summary-row discount">
+                    <span><i class="bi bi-tag-fill me-1"></i>Discount</span>
+                    <span>- Taka @Model.Discount.ToString("N2")</span>
+                </div>
+                <div class="od-summary-row tax">
+                    <span><i class="bi bi-receipt-cutoff me-1"></i>Tax / VAT</span>
+                    <span>+ Taka @Model.Tax.ToString("N2")</span>
+                </div>
+                <div class="od-summary-row od-summary-total">
+                    <span>Grand Total</span>
+                    <span>Taka @grandTotal.ToString("N2")</span>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="od-glass p-4">
+                <h5 class="od-section-title mb-3">Quick Actions</h5>
+
+                @if (canManage)
+                {
+                    <a href="@Url.Action("EditOrder", "Admin", new { id = Model.OrderId })"
+                       class="od-btn w-100 d-block text-center mb-2">
+                        <i class="bi bi-pencil me-2"></i>Edit Order
+                    </a>
+                }
+
+                <a href="@Url.Action("Invoice", "Admin", new { id = Model.OrderId })"
+                   class="od-btn w-100 d-block text-center mb-2"
+                   target="_blank"
+                   style="background:linear-gradient(145deg,#ffffff,#EDE9FE);color:#7C3AED;box-shadow:4px 4px 10px rgba(124,58,237,0.15), -4px -4px 10px rgba(255,255,255,0.9);">
+                    <i class="bi bi-printer me-2"></i>Print Invoice
+                </a>
+
+                <a href="@Url.Action("Orders", "Admin")"
+                   class="od-btn-ghost w-100 d-block text-center">
+                    <i class="bi bi-list me-2"></i>All Orders
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

@@ -1,0 +1,348 @@
+@*
+    Shared analytics graph modal. Include once per page with:
+        @Html.Partial("_GraphModal")
+
+    Trigger it from a button with data attributes:
+        <button class="graph-btn" data-graph="orders" data-title="Orders (last 6 months)">
+            <i class="bi bi-bar-chart-fill"></i> Graph
+        </button>
+
+    data-graph must be one of: users | orders | products | promoCodes | purchases | sales | warehouses | financials
+    (matches an /Analytics/{Name} JSON endpoint).
+*@
+
+<div class="modal fade" id="graphModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content graph-modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold graph-modal-title" id="graphModalTitle">
+                    <i class="bi bi-bar-chart-fill me-2"></i>Analytics
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="graphModalSummary" class="graph-summary-row mb-3"></div>
+                <div class="graph-canvas-wrap">
+                    <canvas id="graphModalCanvas"></canvas>
+                </div>
+                <div id="graphModalEmpty" class="graph-empty" style="display:none;">
+                    <i class="bi bi-bar-chart"></i>
+                    <p class="mb-0">No data available yet for this period.</p>
+                </div>
+                <div id="graphModalError" class="graph-error" style="display:none;">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <p class="mb-0" id="graphModalErrorText">Could not load this graph.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .graph-btn {
+        border: none;
+        border-radius: 9px;
+        padding: 6px 12px;
+        background: rgba(124,58,237,0.12);
+        color: #4C1D95;
+        font-weight: 600;
+        font-size: .78rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: all .2s ease;
+    }
+    .graph-btn:hover {
+        background: linear-gradient(90deg,#3B82F6,#7C3AED);
+        color: #fff;
+    }
+
+    .graph-modal-content {
+        border: none;
+        border-radius: 20px;
+        background: rgba(255,255,255,0.92);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+    }
+
+    .graph-modal-title {
+        background: linear-gradient(90deg,#3B82F6,#7C3AED);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .graph-canvas-wrap {
+        position: relative;
+        height: 320px;
+    }
+
+    .graph-summary-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .graph-summary-chip {
+        background: rgba(124,58,237,0.08);
+        border-radius: 12px;
+        padding: 8px 14px;
+        flex: 1 1 140px;
+    }
+    .graph-summary-chip .label {
+        font-size: .72rem;
+        color: #6c757d;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+    }
+    .graph-summary-chip .value {
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: #24324A;
+    }
+
+    .graph-empty, .graph-error {
+        text-align: center;
+        padding: 40px 10px;
+        color: #64748B;
+    }
+    .graph-empty i, .graph-error i {
+        font-size: 2.2rem;
+        display: block;
+        margin-bottom: 10px;
+        color: #A78BFA;
+    }
+    .graph-error i {
+        color: #d98a8a;
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+
+<script>
+    (function () {
+        // If this partial gets re-injected by an AJAX page navigation
+        // (see _Layout.cshtml's pjax-style content loader), tear down
+        // the previous modal instance and click listener first so they
+        // don't stack up.
+        if (window.__graphModalCleanup) {
+            window.__graphModalCleanup();
+        }
+
+        var graphModalEl = document.getElementById('graphModal');
+        if (!graphModalEl || typeof bootstrap === 'undefined') {
+            return;
+        }
+
+        var graphModal = new bootstrap.Modal(graphModalEl);
+        var chartInstance = null;
+
+        var endpoints = {
+            orders: '@Url.Action("Orders", "Analytics")',
+            products: '@Url.Action("Products", "Analytics")',
+            purchases: '@Url.Action("Purchases", "Analytics")',
+            sales: '@Url.Action("Sales", "Analytics")',
+            warehouses: '@Url.Action("Warehouses", "Analytics")',
+            users: '@Url.Action("Users", "Analytics")',
+            promoCodes: '@Url.Action("PromoCodes", "Analytics")',
+            financials: '@Url.Action("Financials", "Analytics")'
+        };
+
+        function fmtMoney(n) {
+            return 'Taka ' + (n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function showState(state, message) {
+            document.getElementById('graphModalCanvas').style.display = state === 'ok' ? 'block' : 'none';
+            document.getElementById('graphModalEmpty').style.display = state === 'empty' ? 'block' : 'none';
+            document.getElementById('graphModalError').style.display = state === 'error' ? 'block' : 'none';
+            document.getElementById('graphModalSummary').style.display = state === 'ok' ? 'flex' : 'none';
+
+            if (state === 'error' && message) {
+                document.getElementById('graphModalErrorText').textContent = message;
+            }
+        }
+
+        function chip(label, value) {
+            return '<div class="graph-summary-chip"><div class="label">' + label + '</div><div class="value">' + value + '</div></div>';
+        }
+
+        function renderChart(type, labels, datasets) {
+            var ctx = document.getElementById('graphModalCanvas').getContext('2d');
+
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            chartInstance = new Chart(ctx, {
+                type: type,
+                data: { labels: labels, datasets: datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: type === 'doughnut' || datasets.length > 1 } },
+                    scales: type === 'bar' || type === 'line' ? {
+                        y: { beginAtZero: true }
+                    } : {}
+                }
+            });
+        }
+
+        function loadGraph(kind, title) {
+            document.getElementById('graphModalTitle').innerHTML = '<i class="bi bi-bar-chart-fill me-2"></i>' + title;
+            document.getElementById('graphModalSummary').innerHTML = '';
+            showState('ok');
+            graphModal.show();
+
+            var url = endpoints[kind];
+            if (!url) {
+                showState('error', 'Unknown graph type.');
+                return;
+            }
+
+            fetch(url)
+                .then(function (r) {
+                    if (!r.ok) { throw new Error('HTTP ' + r.status); }
+                    return r.json();
+                })
+                .then(function (data) {
+                    if (!data.success) {
+                        showState('error', data.message || 'You do not have permission to view this graph.');
+                        return;
+                    }
+
+                    if (kind === 'users') {
+                        if (!data.labels || data.labels.length === 0) { showState('empty'); return; }
+                        document.getElementById('graphModalSummary').innerHTML =
+                            chip('Total Users', data.totalUsers) +
+                            chip('Active', data.activeUsers) +
+                            chip('Inactive', data.inactiveUsers);
+                        renderChart('bar', data.labels, [
+                            { label: 'Users', data: data.roleCounts, backgroundColor: '#3B82F6' }
+                        ]);
+                    }
+                    else if (kind === 'orders') {
+                        var hasData = data.orderCounts.some(function (v) { return v > 0; });
+                        if (!hasData) { showState('empty'); return; }
+
+                        document.getElementById('graphModalSummary').innerHTML =
+                            chip('This Month Orders', data.thisMonthCount) +
+                            chip('This Month Sales', fmtMoney(data.thisMonthAmount));
+
+                        renderChart('bar', data.labels, [
+                            { label: 'Orders', data: data.orderCounts, backgroundColor: '#7C3AED' }
+                        ]);
+                    }
+                    else if (kind === 'products') {
+                        document.getElementById('graphModalSummary').innerHTML =
+                            chip('Total Products', data.totalProducts) +
+                            chip('Active', data.activeProducts) +
+                            chip('Low Stock', data.lowStockProducts) +
+                            chip('Out of Stock', data.outOfStockProducts) +
+                            chip('Stock Units', data.totalStockUnits) +
+                            chip('Added This Month', data.thisMonthAdded);
+
+                        renderChart('bar', data.labels, [
+                            { label: 'Products Added', data: data.addedCounts, backgroundColor: '#3B82F6' }
+                        ]);
+                    }
+                    else if (kind === 'promoCodes') {
+                        if (!data.labels || data.labels.length === 0) { showState('empty'); return; }
+                        document.getElementById('graphModalSummary').innerHTML =
+                            chip('Total Promo Codes', data.total);
+                        renderChart('doughnut', data.labels, [
+                            { label: 'Promo Codes', data: data.counts, backgroundColor: ['#3B82F6', '#7C3AED', '#FB923C'] }
+                        ]);
+                    }
+                    else if (kind === 'financials') {
+                        var financialTotal = data.saleAmounts.reduce(function (a,b) { return a+b; }, 0) +
+                            data.purchaseAmounts.reduce(function (a,b) { return a+b; }, 0) +
+                            data.salaryAmounts.reduce(function (a,b) { return a+b; }, 0);
+                        if (financialTotal === 0) { showState('empty'); return; }
+                        document.getElementById('graphModalSummary').innerHTML =
+                            chip('This Month Orders', data.thisMonthOrders) +
+                            chip('This Month Sales', fmtMoney(data.thisMonthSales)) +
+                            chip('This Month Purchases', fmtMoney(data.thisMonthPurchases)) +
+                            chip('This Month Salary', fmtMoney(data.thisMonthSalary));
+                        renderChart('line', data.labels, [
+                            { label: 'Sales', data: data.saleAmounts, borderColor: '#3B82F6', backgroundColor: 'rgba(59,130,246,0.12)', fill: true, tension: 0.3 },
+                            { label: 'Purchases', data: data.purchaseAmounts, borderColor: '#198754', backgroundColor: 'rgba(25,135,84,0.08)', fill: false, tension: 0.3 },
+                            { label: 'Salary', data: data.salaryAmounts, borderColor: '#FB923C', backgroundColor: 'rgba(251,146,60,0.08)', fill: false, tension: 0.3 }
+                        ]);
+                    }
+                    else if (kind === 'purchases') {
+                        var totalAmt = data.purchaseAmounts.reduce(function (a, b) { return a + b; }, 0);
+                        var totalCnt = data.purchaseCounts.reduce(function (a, b) { return a + b; }, 0);
+
+                        if (totalCnt === 0) { showState('empty'); return; }
+
+                        document.getElementById('graphModalSummary').innerHTML =
+                            chip('Total Purchases', totalCnt) +
+                            chip('Total Spent', fmtMoney(totalAmt));
+
+                        renderChart('line', data.labels, [
+                            { label: 'Purchase Amount', data: data.purchaseAmounts, borderColor: '#198754', backgroundColor: 'rgba(25,135,84,0.15)', fill: true, tension: 0.3 }
+                        ]);
+                    }
+                    else if (kind === 'sales') {
+                        var totalSaleAmt = data.saleAmounts.reduce(function (a, b) { return a + b; }, 0);
+                        var totalSaleCnt = data.saleCounts.reduce(function (a, b) { return a + b; }, 0);
+
+                        if (totalSaleCnt === 0) { showState('empty'); return; }
+
+                        document.getElementById('graphModalSummary').innerHTML =
+                            chip('Total Sales', totalSaleCnt) +
+                            chip('Total Revenue', fmtMoney(totalSaleAmt));
+
+                        renderChart('line', data.labels, [
+                            { label: 'Sale Amount', data: data.saleAmounts, borderColor: '#3B82F6', backgroundColor: 'rgba(59,130,246,0.15)', fill: true, tension: 0.3 }
+                        ]);
+                    }
+                    else if (kind === 'warehouses') {
+                        if (!data.labels || data.labels.length === 0) { showState('empty'); return; }
+
+                        document.getElementById('graphModalSummary').innerHTML =
+                            chip('Warehouses', data.labels.length);
+
+                        renderChart('bar', data.labels, [
+                            { label: 'Staff', data: data.staffCounts, backgroundColor: '#0d6efd' },
+                            { label: 'Purchases', data: data.purchaseCounts, backgroundColor: '#198754' },
+                            { label: 'Sales', data: data.saleCounts, backgroundColor: '#3B82F6' }
+                        ]);
+                    }
+                })
+                .catch(function (err) {
+                    console.error('Graph load error:', err);
+                    showState('error', 'Something went wrong loading this graph.');
+                });
+        }
+
+        function onDocumentClick(e) {
+            var btn = e.target.closest('.graph-btn');
+            if (!btn) { return; }
+
+            e.preventDefault();
+            var kind = btn.getAttribute('data-graph');
+            var title = btn.getAttribute('data-title') || 'Analytics';
+            loadGraph(kind, title);
+        }
+
+        document.addEventListener('click', onDocumentClick);
+
+        window.__graphModalCleanup = function () {
+            document.removeEventListener('click', onDocumentClick);
+            if (chartInstance) {
+                chartInstance.destroy();
+                chartInstance = null;
+            }
+        };
+
+        graphModalEl.addEventListener('hidden.bs.modal', function () {
+            if (chartInstance) {
+                chartInstance.destroy();
+                chartInstance = null;
+            }
+        });
+    })();
+</script>

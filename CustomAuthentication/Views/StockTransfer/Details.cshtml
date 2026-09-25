@@ -1,0 +1,108 @@
+﻿@model CustomAuthentication.Models.StockTransfer
+@{ ViewBag.Title = "Transfer Details"; }
+<style>
+.glass-card{background:rgba(255,255,255,.55);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.6);border-radius:20px;box-shadow:0 8px 32px rgba(124,58,237,.15);}
+.title-grad{background:linear-gradient(90deg,#3B82F6,#7C3AED);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.btn-ghost{border:none;border-radius:10px;padding:8px 18px;background:linear-gradient(145deg,#ffffff,#EDE9FE);color:#7C3AED;font-weight:600;}
+.btn-ghost:hover{color:#7C3AED;text-decoration:none;}
+.btn-glass{border:none;border-radius:10px;padding:8px 18px;background:linear-gradient(90deg,#3B82F6,#7C3AED);color:#fff;font-weight:600;}
+.btn-danger{border:none;border-radius:10px;padding:8px 18px;background:linear-gradient(90deg,#EF4444,#FB923C);color:#fff;font-weight:600;}
+.lbl{color:#64748B;font-size:.8rem;} .val{color:#24324A;font-weight:600;}
+</style>
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold mb-0 title-grad"><i class="bi bi-arrow-left-right me-2"></i>@Model.TransferNumber</h2>
+        <a href="@Url.Action("Index")" class="btn-ghost"><i class="bi bi-arrow-left me-1"></i>Back</a>
+    </div>
+    @if (TempData["Success"] != null) { <div class="alert alert-success">@TempData["Success"]</div> }
+    @if (TempData["Error"] != null) { <div class="alert alert-danger">@TempData["Error"]</div> }
+
+    <div class="glass-card p-4 mb-4">
+        <div class="row g-3">
+            <div class="col-md-3"><span class="lbl d-block">From Warehouse</span><span class="val">@(Model.FromWarehouse?.Name ?? "-")</span></div>
+            <div class="col-md-3"><span class="lbl d-block">To Warehouse</span><span class="val">@(Model.ToWarehouse?.Name ?? "-")</span></div>
+            <div class="col-md-3"><span class="lbl d-block">Date</span><span class="val">@Model.TransferDate.ToString("dd MMM yyyy")</span></div>
+            <div class="col-md-3"><span class="lbl d-block">Status</span>
+                @if (Model.Status == "Received") { <span class="badge bg-success">Received</span> }
+                else if (Model.Status == "Sent") { <span class="badge" style="background:#7C3AED;color:#fff;">Sent</span> }
+                else if (Model.Status == "Approved") { <span class="badge bg-info text-dark">Approved</span> }
+                else if (Model.Status == "Rejected" || Model.Status == "Cancelled") { <span class="badge bg-danger">@Model.Status</span> }
+                else { <span class="badge bg-warning text-dark">Requested</span> }
+            </div>
+        </div>
+        @if (Model.Status == "Rejected" && !string.IsNullOrEmpty(Model.RejectionReason))
+        {
+            <div class="alert alert-danger mt-3 mb-0"><strong>Rejection reason:</strong> @Model.RejectionReason</div>
+        }
+    </div>
+
+    <div class="glass-card mb-4">
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead><tr><th class="ps-4">Product</th><th class="text-end pe-4">Quantity</th></tr></thead>
+                <tbody>
+                @foreach (var d in Model.StockTransferDetails)
+                {
+                    <tr><td class="ps-4 val">@(d.Product?.ProductName ?? "-")</td><td class="text-end pe-4 val">@d.Quantity</td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 flex-wrap">
+        @if (Model.Status == "Requested")
+        {
+            using (Html.BeginForm("Approve", "StockTransfer", new { id = Model.StockTransferId }, FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn-glass"><i class="bi bi-check-circle me-1"></i>Approve</button>
+            }
+            <button type="button" class="btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal"><i class="bi bi-x-circle me-1"></i>Reject</button>
+        }
+        @if (Model.Status == "Approved")
+        {
+            using (Html.BeginForm("Send", "StockTransfer", new { id = Model.StockTransferId }, FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn-glass" onclick="return confirm('Send this transfer? Stock will leave the source warehouse.');"><i class="bi bi-send me-1"></i>Mark as Sent</button>
+            }
+        }
+        @if (Model.Status == "Sent")
+        {
+            using (Html.BeginForm("Receive", "StockTransfer", new { id = Model.StockTransferId }, FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn-glass"><i class="bi bi-box-seam me-1"></i>Mark as Received</button>
+            }
+        }
+        @if (Model.Status == "Requested" || Model.Status == "Approved")
+        {
+            using (Html.BeginForm("Cancel", "StockTransfer", new { id = Model.StockTransferId }, FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn-ghost" onclick="return confirm('Cancel this transfer request?');">Cancel Request</button>
+            }
+        }
+    </div>
+</div>
+
+<div class="modal fade" id="rejectModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content" style="border-radius:16px;">
+            @using (Html.BeginForm("Reject", "StockTransfer", new { id = Model.StockTransferId }, FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <div class="modal-header"><h5 class="modal-title">Reject Transfer</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <label class="form-label lbl">Reason</label>
+                    <textarea name="reason" class="form-control" rows="3" required></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-ghost" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn-danger">Reject Transfer</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>

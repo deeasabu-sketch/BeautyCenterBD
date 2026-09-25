@@ -1,0 +1,89 @@
+﻿@model IEnumerable<CustomAuthentication.Models.Order>
+@{ ViewBag.Title = "My Orders"; }
+<style>
+    .glass-card {
+        background: rgba(255,255,255,.55);
+        backdrop-filter: blur(14px);
+        border: 1px solid rgba(255,255,255,.6);
+        border-radius: 20px;
+        box-shadow: 0 8px 32px rgba(124,58,237,.15);
+    }
+
+    .title-grad {
+        background: linear-gradient(90deg,#3B82F6,#7C3AED);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .btn-glass {
+        border: none;
+        border-radius: 10px;
+        padding: 8px 18px;
+        background: linear-gradient(90deg,#3B82F6,#7C3AED);
+        color: #fff;
+        font-weight: 600;
+    }
+
+        .btn-glass:hover {
+            color: #fff;
+            text-decoration: none;
+            opacity: .92;
+        }
+
+    .btn-ghost-sm {
+        border: none;
+        border-radius: 8px;
+        padding: 5px 12px;
+        background: linear-gradient(145deg,#ffffff,#EDE9FE);
+        color: #7C3AED;
+        font-weight: 600;
+        font-size: .85rem;
+    }
+</style>
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div><h2 class="fw-bold mb-1 title-grad"><i class="bi bi-bag-check me-2"></i>My Orders</h2><p class="mb-0" style="color:#64748B;">Your order history and invoices</p></div>
+        <a href="@Url.Action("Index","Home")" class="btn-glass"><i class="bi bi-shop me-1"></i>Continue Shopping</a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="glass-card p-5 text-center">
+            <i class="bi bi-bag-x" style="font-size:2.5rem;color:#7C3AED;"></i>
+            <p class="mt-2 mb-0" style="color:#64748B;">You haven't placed any orders yet.</p>
+        </div>
+    }
+    else
+    {
+        <div class="glass-card">
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead><tr><th class="ps-4">Order #</th><th>Date</th><th>Items</th><th>Total</th><th>Status</th><th class="text-end pe-4">Actions</th></tr></thead>
+                    <tbody>
+                        @foreach (var order in Model)
+                        {
+                            <tr>
+                                <td class="ps-4 fw-semibold" style="color:#24324A;">@order.OrderNumber</td>
+                                <td style="color:#64748B;">@order.OrderDate.ToString("dd MMM yyyy")</td>
+                                <td style="color:#64748B;">@order.OrderItems.Count item(s)</td>
+                                <td style="color:#24324A;" class="fw-semibold">Taka @order.TotalAmount.ToString("N2")</td>
+                                <td>
+                                    @if (order.OrderStatus == "Delivered")
+                                    {<span class="badge bg-success">Delivered</span> }
+                                    else if (order.OrderStatus == "Cancelled")
+                                    { <span class="badge bg-danger">Cancelled</span> }
+                                    else if (order.OrderStatus == "Shipped")
+                                    { <span class="badge" style="background:#7C3AED;color:#fff;">Shipped</span> }
+                                    else
+                                    { <span class="badge bg-warning text-dark">@order.OrderStatus</span>}
+                                </td>
+                                <td class="text-end pe-4"><a href="@Url.Action("Invoice",new { id = order.OrderId })" class="btn-ghost-sm"><i class="bi bi-receipt"></i> Invoice</a></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>

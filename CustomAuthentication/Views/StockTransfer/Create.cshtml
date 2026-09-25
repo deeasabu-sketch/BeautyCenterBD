@@ -1,0 +1,84 @@
+﻿@model CustomAuthentication.ViewModel.StockTransferCreateViewModel
+@using System.Web
+@{ ViewBag.Title = "Request Stock Transfer"; }
+<style>
+.glass-card{background:rgba(255,255,255,.55);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.6);border-radius:20px;box-shadow:0 8px 32px rgba(124,58,237,.15);}
+.title-grad{background:linear-gradient(90deg,#3B82F6,#7C3AED);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.frm-control,.frm-control:focus{background:rgba(255,255,255,.7);border:1px solid rgba(124,58,237,.25);box-shadow:none;}
+.lbl{color:#24324A;font-weight:600;}
+.btn-glass{border:none;border-radius:10px;padding:10px 22px;background:linear-gradient(90deg,#3B82F6,#7C3AED);color:#fff;font-weight:600;}
+.btn-ghost{border:none;border-radius:10px;padding:10px 22px;background:linear-gradient(145deg,#ffffff,#EDE9FE);color:#7C3AED;font-weight:600;}
+.btn-ghost:hover{color:#7C3AED;text-decoration:none;}
+.btn-ghost-sm{border:none;border-radius:8px;padding:6px 14px;background:linear-gradient(145deg,#ffffff,#EDE9FE);color:#7C3AED;font-weight:600;font-size:.85rem;}
+.row-remove{border:none;background:transparent;color:#EF4444;font-size:1.1rem;}
+</style>
+<div class="container py-5">
+    @Html.Partial("_BackBar", new List<CustomAuthentication.ViewModel.BackBarLink>
+    {
+        new CustomAuthentication.ViewModel.BackBarLink("Dashboard", "Admin", "Dashboard"),
+        new CustomAuthentication.ViewModel.BackBarLink("Stock Transfers", "StockTransfer", "Index")
+    })
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold mb-0 title-grad"><i class="bi bi-arrow-left-right me-2"></i>Request Stock Transfer</h2>
+        <a href="@Url.Action("Index")" class="btn-ghost"><i class="bi bi-arrow-left me-1"></i>Back</a>
+    </div>
+    @using (Html.BeginForm("Create", "StockTransfer", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(false, "", new { @class = "alert alert-danger" })
+        <div class="glass-card p-4 mb-4">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    @Html.Label("FromWarehouseId", "From Warehouse", new { @class = "form-label lbl" })
+                    @Html.DropDownListFor(m => m.FromWarehouseId, Model.WarehouseOptions, "-- Select --", new { @class = "form-select frm-control" })
+                </div>
+                <div class="col-md-6">
+                    @Html.Label("ToWarehouseId", "To Warehouse", new { @class = "form-label lbl" })
+                    @Html.DropDownListFor(m => m.ToWarehouseId, Model.WarehouseOptions, "-- Select --", new { @class = "form-select frm-control" })
+                </div>
+            </div>
+        </div>
+        <div class="glass-card p-4 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0" style="color:#24324A;">Products</h5>
+                <button type="button" id="addRowBtn" class="btn-ghost-sm"><i class="bi bi-plus-lg"></i> Add Product</button>
+            </div>
+            <div class="table-responsive">
+                <table class="table align-middle" id="itemsTable">
+                    <thead><tr><th>Product</th><th style="width:140px;">Quantity</th><th style="width:40px;"></th></tr></thead>
+                    <tbody id="itemsBody"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="d-flex justify-content-end gap-2">
+            <a href="@Url.Action("Index")" class="btn-ghost">Cancel</a>
+            <button type="submit" class="btn-glass"><i class="bi bi-check-circle me-1"></i>Submit Request</button>
+        </div>
+    }
+</div>
+@section Scripts {
+<script>
+var productOptions = [
+@foreach (var p in Model.ProductOptions)
+{
+@: { value: "@p.Value", text: "@Html.Raw(HttpUtility.JavaScriptStringEncode(p.Text))" },
+}
+];
+var rowIndex = 0;
+function addRow() {
+    var tbody = document.getElementById("itemsBody");
+    var tr = document.createElement("tr");
+    tr.className = "item-row";
+    var optionsHtml = '<option value="">-- Select Product --</option>';
+    productOptions.forEach(function (p) { optionsHtml += '<option value="' + p.value + '">' + p.text + '</option>'; });
+    tr.innerHTML =
+        '<td><select name="Items[' + rowIndex + '].ProductId" class="form-select frm-control">' + optionsHtml + '</select></td>' +
+        '<td><input type="number" name="Items[' + rowIndex + '].Quantity" class="form-control frm-control" min="1" value="1" /></td>' +
+        '<td><button type="button" class="row-remove" onclick="this.closest(\'tr\').remove()"><i class="bi bi-trash3"></i></button></td>';
+    tbody.appendChild(tr);
+    rowIndex++;
+}
+document.getElementById("addRowBtn").addEventListener("click", addRow);
+addRow();
+</script>
+}

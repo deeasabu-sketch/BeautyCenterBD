@@ -1,0 +1,62 @@
+﻿@*
+    Shared "back" navigation bar for Create/Edit forms.
+
+    Usage:
+        @Html.Partial("_BackBar", new BackBarLink[] {
+            new BackBarLink { Text = "Dashboard", Controller = "Admin", Action = "Dashboard" },
+            new BackBarLink { Text = "Products", Controller = "Product", Action = "Index" }
+        })
+
+    Renders one back-styled pill per link, most-general first, most-specific
+    last (e.g. Dashboard, then the list page for this entity).
+*@
+@model IEnumerable<CustomAuthentication.ViewModel.BackBarLink>
+
+<div class="back-bar mb-3">
+    @foreach (var link in Model)
+    {
+        <a href="@Url.Action(link.Action, link.Controller, link.RouteValues)" class="back-bar-link">
+            <i class="bi bi-arrow-left"></i>
+            <span>@link.Text</span>
+        </a>
+    }
+</div>
+
+<style>
+    .back-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .back-bar-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border: none;
+        border-radius: 30px;
+        padding: 8px 16px;
+        background: rgba(255,255,255,0.65);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(124,58,237,0.18);
+        color: #4C1D95;
+        font-weight: 600;
+        font-size: .85rem;
+        text-decoration: none;
+        box-shadow: 3px 3px 8px rgba(124,58,237,0.10), -3px -3px 8px rgba(255,255,255,0.7);
+        transition: all .2s ease;
+    }
+
+    .back-bar-link:hover {
+        color: #fff;
+        text-decoration: none;
+        background: linear-gradient(90deg,#3B82F6,#7C3AED);
+        box-shadow: 4px 4px 12px rgba(124,58,237,0.25);
+        transform: translateY(-1px);
+    }
+
+    .back-bar-link i {
+        font-size: .9rem;
+    }
+</style>
